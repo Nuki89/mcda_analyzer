@@ -1,0 +1,23 @@
+/* .rotate-on-hover {
+    transition: transform 1.5s;
+}
+
+.rotate-on-hover:hover {
+    transform: rotate(360deg);
+}
+
+a {
+    text-decoration: none;
+} */
+
+.navbar-brand {
+    color: #b66dff;
+}
+
+.nav-link {
+    color: #b66dff !important;
+}
+
+.nav-link:hover{
+    color: #8000ff !important;
+}
