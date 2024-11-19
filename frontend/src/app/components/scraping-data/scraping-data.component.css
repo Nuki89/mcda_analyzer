@@ -1,0 +1,54 @@
+::ng-deep .ag-sort-indicator-container {
+  flex: 1 !important;
+  justify-content: end !important;
+  border-right: 1px solid lightgray;
+  padding-right: 10px;
+}
+  
+::ng-deep .ag-header-cell-text {
+  display: flex !important;
+}
+  
+.rounded-wrapper {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #ccc;
+}
+
+::ng-deep .ag-theme-alpine-dark {
+  --ag-background-color: #21222C;
+  --ag-foreground-color: #D16FFF;
+  --ag-header-background-color: #21222C;
+  --ag-border-color: #7D3C98;
+  --ag-accent-color: #D16FFF;
+  --ag-header-foreground-color: #D16FFF;
+  --ag-font-size: 12px;
+
+  --ag-data-color: #D16FFF;
+  --ag-odd-row-background-color: #1A1A1D;
+  --ag-even-row-background-color: #21222C;
+  --ag-row-hover-color: #333333;
+  --ag-row-border-color: #7D3C98;
+}
+
+::ng-deep .ag-theme-material {
+  --ag-alternating-background-color: #f9f9f9;
+  --ag-row-hover-color: #d9edf7;
+  --ag-inherited-column-hover-color: var(--ag-column-hover-color);
+}
+
+::ng-deep .ag-theme-material .ag-header {
+  background-color: #f4f4f4; 
+  font-size: 14px; 
+  font-weight: bold;
+  color: #333; 
+}
+
+::ng-deep .ag-theme-material .ag-header-cell {
+  border-bottom: 2px solid #ccc;
+  text-align: left; 
+}
+
+::ng-deep .ag-theme-material .ag-header-cell-label {
+  justify-content: left;
+}
