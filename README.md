@@ -74,7 +74,9 @@ ng s -o
 ```
 
 ## Start both frontend and backend with one command
+First add permission to execute the script
 ```bash
+chmod +x start.sh
 ./start.sh
 ```
 
