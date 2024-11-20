@@ -160,22 +160,28 @@ class TOPSISView(APIView):
                 return Response({"error": "Failed to fetch criteria and weights."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             criteria = criteria_response.json()
+            
+            selected_criteria_param = request.query_params.get('selected_criteria', None)
+            if selected_criteria_param:
+                selected_criteria = selected_criteria_param.split(',')
+                criteria = [c for c in criteria if c['name'] in selected_criteria]
+
+            if not criteria:
+                return Response({"error": "No valid criteria selected."}, status=status.HTTP_400_BAD_REQUEST)
+
             criteria_names = [c['name'] for c in criteria]
             default_weights = np.array([c['default_weight'] for c in criteria])
 
             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
             if not entries.exists():
                 return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
-
+            
             company_names = [entry.name for entry in entries]
+
             data = np.array([
                 [
-                    float(entry.revenue or 0),
-                    float(entry.profits or 0),
-                    float(entry.assets or 0),
-                    float(entry.employees or 0),
-                    float(entry.years_on_list or 0),
-                    float(entry.change_in_rank or 0),
+                    getattr(entry, c['field'], 0) or 0 
+                    for c in criteria
                 ]
                 for entry in entries
             ], dtype=float)
@@ -191,7 +197,6 @@ class TOPSISView(APIView):
 
                     if not np.isclose(weights.sum(), 1.0):
                         weights = weights / weights.sum()
-
                 except ValueError:
                     return Response({"error": "Weights must be numeric values."}, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -206,87 +211,75 @@ class TOPSISView(APIView):
             result = {
                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
                 "closeness_coefficients": dict(zip(sorted_names, sorted_coefficients)),
-                # "criteria": criteria_names,
-                # "weights": weights.tolist(),
-                # "best_company": sorted_names[0],
-                # "highest_coefficient": sorted_coefficients[0],
             }
 
             return Response(result, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        # result = {
-                # "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
-        #         "closeness_coefficients": dict(zip(company_names, all_coefficients)),
-        #         "best_company": company_names[best_index],
-        #         "highest_coefficient": highest_coefficient,
-        #     }
 
 
-# PREVIOUS CODE = static weights
+#### BEFORE
 # class TOPSISView(APIView):
 #     def get(self, request):
 #         try:
-#             # Fetch the latest scraped data
-#             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
+#             criteria_response = requests.get('http://127.0.0.1:8000/criteria/')
+#             if criteria_response.status_code != 200:
+#                 return Response({"error": "Failed to fetch criteria and weights."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+#             criteria = criteria_response.json()
+#             criteria_names = [c['name'] for c in criteria]
+#             default_weights = np.array([c['default_weight'] for c in criteria])
 
-#             # Check if we have enough data
+#             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
 #             if not entries.exists():
 #                 return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
 
-#             # Extract company data for TOPSIS
 #             company_names = [entry.name for entry in entries]
 #             data = np.array([
 #                 [
-#                     float(entry.revenue),
-#                     float(entry.profits),
-#                     float(entry.assets),
-#                     float(entry.employees),
-#                     float(entry.years_on_list),
-#                     float(entry.change_in_rank)
+#                     float(entry.revenue or 0),
+#                     float(entry.profits or 0),
+#                     float(entry.assets or 0),
+#                     float(entry.employees or 0),
+#                     float(entry.years_on_list or 0),
+#                     float(entry.change_in_rank or 0),
 #                 ]
 #                 for entry in entries
 #             ], dtype=float)
 
-#             # Define criteria names
-#             criteria_names = ["Revenue", "Profits", "Assets", "Employees", "Years on List", "Change in Rank"]
-
-#             # Get weights from the request or use default weights
 #             weights_param = request.query_params.get('weights', None)
 #             if weights_param:
 #                 try:
-#                     # Split the string into a list and convert to float
 #                     weights = np.array([float(w) for w in weights_param.split(',')])
-                    
-#                     # Ensure the number of weights matches the criteria count
 #                     if len(weights) != len(criteria_names):
 #                         return Response({
 #                             "error": f"Invalid weights. Expected {len(criteria_names)} weights but got {len(weights)}."
 #                         }, status=status.HTTP_400_BAD_REQUEST)
-                    
-#                     # Normalize weights if they do not sum to 1
+
 #                     if not np.isclose(weights.sum(), 1.0):
 #                         weights = weights / weights.sum()
 
 #                 except ValueError:
 #                     return Response({"error": "Weights must be numeric values."}, status=status.HTTP_400_BAD_REQUEST)
 #             else:
-#                 weights = np.array([0.3, 0.2, 0.2, 0.1, 0.1, 0.1])  # Default weights
+#                 weights = default_weights
 
-
-#             # Perform TOPSIS calculation
 #             all_coefficients, highest_coefficient, best_index = calculate_topsis(data, weights, company_names, criteria_names)
 
-#             # Return the results
+#             sorted_indices = np.argsort(-all_coefficients)
+#             sorted_names = [company_names[i] for i in sorted_indices]
+#             sorted_coefficients = [all_coefficients[i] for i in sorted_indices]
+            
 #             result = {
-#                 "criteria": criteria_names,
-#                 "weights": weights.tolist(),
-#                 "closeness_coefficients": dict(zip(company_names, all_coefficients)),
-#                 "best_company": company_names[best_index],
-#                 "highest_coefficient": highest_coefficient
+#                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+#                 "closeness_coefficients": dict(zip(sorted_names, sorted_coefficients)),
+#                 # "criteria": criteria_names,
+#                 # "weights": weights.tolist(),
+#                 # "best_company": sorted_names[0],
+#                 # "highest_coefficient": sorted_coefficients[0],
 #             }
+
 #             return Response(result, status=status.HTTP_200_OK)
 
 #         except Exception as e:
