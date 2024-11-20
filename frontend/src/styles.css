@@ -5,3 +5,5 @@
 /* @import "~ag-grid-community/styles/ag-theme-alpine-dark.css"; */
 /* @import "tailwindcss/tailwind.css";
 @import "~bootstrap/dist/css/bootstrap.min.css"; */
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
