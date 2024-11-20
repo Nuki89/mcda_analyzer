@@ -24,6 +24,7 @@
             <table class="tw-w-full tw-border-collapse tw-border tw-text-left">
               <thead>
                 <tr class="tw-border-b">
+                  <th class="tw-py-2 tw-px-4">Status</th>
                   <th class="tw-py-2 tw-px-4">Criterion</th>
                   <th class="tw-py-2 tw-px-4">Weight</th>
                   <th class="tw-py-2 tw-px-4">Adjust Weight</th>
@@ -31,6 +32,16 @@
               </thead>
               <tbody>
                 <tr *ngFor="let criterion of criteriaWithWeights; let i = index" class="tw-border-b">
+                  <td class="tw-py-2 tw-px-4">
+                    <mat-slide-toggle
+                      [(ngModel)]="criteriaWithWeights[i].active"
+                      (change)="onToggleChange()"
+                    ></mat-slide-toggle>
+                  </td>
+                  
+                  <!-- <td class="tw-py-2 tw-px-4">
+                    <p><mat-slide-toggle></mat-slide-toggle></p>
+                  </td> -->
                   <td class="tw-py-2 tw-px-4">{{ criterion.name }}</td>
                   <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
                   <td class="tw-py-2 tw-px-4">
@@ -101,5 +112,5 @@
 </div>
 
 <div *ngIf="!topsisData" class="tw-text-center tw-mt-10">
-<p>Loading Topsis data...</p>
+  <p>Loading Topsis data...</p>
 </div>
