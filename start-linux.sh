@@ -1,5 +1,7 @@
 DJANGO_PORT=8000
 ANGULAR_PORT=4200
+BACKEND_HOST=0.0.0.0
+FRONTEND_HOST=0.0.0.0
 BACKEND_DIR="backend"
 FRONTEND_DIR="frontend"
 
@@ -20,7 +22,7 @@ if lsof -i:$DJANGO_PORT; then
 else
     # Start Django backend on port 0.0.0.0:$DJANGO_PORT in the background
     echo "Starting Django backend..."
-    (cd $BACKEND_DIR && python manage.py runserver 0.0.0.0:$DJANGO_PORT) &
+    (cd $BACKEND_DIR && python manage.py runserver $BACKEND_HOST:$DJANGO_PORT) &
 fi
 
 if lsof -i:$ANGULAR_PORT; then
@@ -28,7 +30,7 @@ if lsof -i:$ANGULAR_PORT; then
 else
     # Start Angular frontend on port $ANGULAR_PORT in the background
     echo "Starting Angular frontend..."
-    (cd $FRONTEND_DIR && ng serve --port $ANGULAR_PORT -o) &
+    (cd $FRONTEND_DIR && ng serve --host $FRONTEND_HOST --port $ANGULAR_PORT -o) &
 fi
 
 # Wait for background processes to complete
