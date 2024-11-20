@@ -34,18 +34,28 @@
                 <tr *ngFor="let criterion of criteriaWithWeights; let i = index" class="tw-border-b">
                   <td class="tw-py-2 tw-px-4">
                     <mat-slide-toggle
-                      [(ngModel)]="criteriaWithWeights[i].active"
-                      (change)="onToggleChange()"
-                    ></mat-slide-toggle>
+                    [(ngModel)]="criteriaWithWeights[i].active"
+                    (change)="onToggleChange()"
+                    [ngClass]="{
+                      'toggle-active': criteriaWithWeights[i].active,
+                      'toggle-inactive': !criteriaWithWeights[i].active
+                    }">
+                  </mat-slide-toggle>
                   </td>
-                  
-                  <!-- <td class="tw-py-2 tw-px-4">
-                    <p><mat-slide-toggle></mat-slide-toggle></p>
-                  </td> -->
-                  <td class="tw-py-2 tw-px-4">{{ criterion.name }}</td>
+                  <td 
+                    class="tw-py-2 tw-px-4" 
+                    [ngStyle]="!criterion.active ? {'text-decoration': 'line-through'} : {}">
+                    {{ criterion.name }}
+                  </td> 
                   <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
                   <td class="tw-py-2 tw-px-4">
                     <select
+                      [disabled]="!criterion.active"
+                      [ngClass]="{
+              
+                        'tw-bg-gray-200 cursor-not-allowed': !criterion.active,
+                        'tw-cursor-pointer': criterion.active,
+                      }"
                       class="tw-border tw-rounded tw-px-2 tw-py-1"
                       [(ngModel)]="criteriaWithWeights[i].weight"
                       (change)="updateWeight(i, criteriaWithWeights[i].weight)">
