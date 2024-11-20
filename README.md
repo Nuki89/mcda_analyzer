@@ -9,6 +9,9 @@ Project implements Multi-Criteria Decision Analysis (MCDA) methods for decision 
 - PROMETHEE (Preference Ranking Organization Method for Enrichment Evaluations)
 - WSM (Weighted Sum Model)
 
+## Pre-requisites
+- Python 3.11.4 or higher
+
 ## Installation backend (Django)
 
 ### For MacOS and Linux
@@ -57,6 +60,11 @@ python manage.py runserver
 ```
 
 ## Installation frontend (Angular)
+**Install Angular CLI:**
+```bash
+npm install -g @angular/cli@18
+```
+
 1. **Install Angular Dependencies:**
 Before installing dependencies remove existing modules and than reinstall them. 
 If you already had npm installed first run this command: `rm -rf node_modules`
