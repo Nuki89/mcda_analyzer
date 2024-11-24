@@ -6,8 +6,8 @@ from django.urls import reverse
 from rest_framework import status
 from .models import *
 from .serializers import *
-from .scraper import scrape_fortune_rows
-from .scraper_optimized import scrape_fortune_rows_hybrid
+from .services.scraper import scrape_fortune_rows
+from .services.scraper_optimized import scrape_fortune_rows_hybrid
 from .mcda import *
 from django.utils import timezone
 from rest_framework import viewsets
