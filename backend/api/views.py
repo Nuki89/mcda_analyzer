@@ -6,8 +6,9 @@ from django.urls import reverse
 from rest_framework import status
 from .models import *
 from .serializers import *
-from .services.scraper import scrape_fortune_rows
-from .services.scraper_optimized import scrape_fortune_rows_hybrid
+# from .services.scraper import scrape_fortune_rows # Old scraper
+from .scrapers.scraper_optimized import scrape_fortune_rows_hybrid
+from .services import *
 from .mcda import *
 from django.utils import timezone
 from rest_framework import viewsets
@@ -16,22 +17,6 @@ import logging
 import requests
 
 logger = logging.getLogger(__name__)
-
-def convert_to_int(value):
-    if value in (None, '-', ''):  # Checks for '-', empty, or None values
-        return None
-    try:
-        return int(value.replace(",", ""))
-    except (ValueError, TypeError):
-        return None
-
-def convert_to_float(value):
-    if value in (None, '-', ''):  # Checks for '-', empty, or None values
-        return None
-    try:
-        return float(value.replace(",", "").replace("$", ""))
-    except (ValueError, TypeError):
-        return None
 
 
 class ApiRootView(APIView):
@@ -46,14 +31,7 @@ class CriteriaWeightsView(ViewSet):
         criteria = list(Criteria.objects.all().values('name', 'field', 'default_weight'))
 
         if not criteria:
-            criteria = [
-                {"name": "Revenue", "field": "revenue", "default_weight": 0.3},
-                {"name": "Profits", "field": "profits", "default_weight": 0.2},
-                {"name": "Assets", "field": "assets", "default_weight": 0.2},
-                {"name": "Employees", "field": "employees", "default_weight": 0.1},
-                {"name": "Years on List", "field": "years_on_list", "default_weight": 0.1},
-                {"name": "Change in Rank", "field": "change_in_rank", "default_weight": 0.1},
-            ]
+            criteria = get_criteria_with_fallback()
         return Response(criteria)
     
 
@@ -62,9 +40,7 @@ class CriteriaDBView(viewsets.ModelViewSet):
     serializer_class = CriteriaSerializer
 
     def list(self, request, *args, **kwargs):
-        criteria = list(self.queryset.values('name', 'field', 'default_weight'))
-        if not criteria:
-            return Response({"error": "No criteria found in the database."}, status=status.HTTP_404_NOT_FOUND)
+        criteria = get_criteria_with_fallback()
         return Response(criteria, status=status.HTTP_200_OK)
 
 
