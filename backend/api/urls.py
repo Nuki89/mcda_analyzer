@@ -17,7 +17,8 @@ router = BaseRouter()
 router.register(r'scraped-data', views.CachedFortuneDataView, basename='scraped-data')
 router.register(r'ahp', views.AHPView, basename='ahp-view')
 router.register(r'promethee', views.PrometheeView, basename='promethee-view')
-router.register(r'criteria', views.CriteriaWeightsView, basename='criteria')
+router.register(r'criteria-db', views.CriteriaWeightsView, basename='criteria-db')
+# router.register(r'criteria', views.CriteriaWeightsView, basename='criteria')
 # router.register(r'topsis', views.TOPSISView, basename='topsis-view')
 
 

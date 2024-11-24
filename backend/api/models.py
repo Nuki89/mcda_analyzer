@@ -21,6 +21,7 @@ class Fortune500Entry(models.Model):
 
     def __str__(self):
         return f"{self.rank}: {self.name} - {self.sector} - {self.industry}"
+
     
 class AHPResult(models.Model):
     name = models.CharField(max_length=255)
@@ -28,3 +29,12 @@ class AHPResult(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.score}"
+    
+
+class Criteria(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    field = models.CharField(max_length=255, unique=True)
+    default_weight = models.FloatField()
+
+    def __str__(self):
+        return f"{self.name} - {self.default_weight} - {self.field}"
