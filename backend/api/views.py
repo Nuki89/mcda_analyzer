@@ -38,25 +38,34 @@ class ApiRootView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({
             "scrape": request.build_absolute_uri(reverse("trigger-scraping")),
-            #"scraped-data": request.build_absolute_uri(reverse("cached-data")),
-            #"ahp": request.build_absolute_uri(reverse("ahp-method")),
-            # "topsis": request.build_absolute_uri(reverse("topsis-method")),
-            #"promethee": request.build_absolute_uri(reverse("promethee-method")),
         })
 
  
-
 class CriteriaWeightsView(ViewSet):
     def list(self, request):
-        criteria = [
-            {"name": "Revenue", "field": "revenue", "default_weight": 0.3},
-            {"name": "Profits", "field": "profits", "default_weight": 0.2},
-            {"name": "Assets", "field": "assets", "default_weight": 0.2},
-            {"name": "Employees", "field": "employees", "default_weight": 0.1},
-            {"name": "Years on List", "field": "years_on_list", "default_weight": 0.1},
-            {"name": "Change in Rank", "field": "change_in_rank", "default_weight": 0.1},
-        ]
+        criteria = list(Criteria.objects.all().values('name', 'field', 'default_weight'))
+
+        if not criteria:
+            criteria = [
+                {"name": "Revenue", "field": "revenue", "default_weight": 0.3},
+                {"name": "Profits", "field": "profits", "default_weight": 0.2},
+                {"name": "Assets", "field": "assets", "default_weight": 0.2},
+                {"name": "Employees", "field": "employees", "default_weight": 0.1},
+                {"name": "Years on List", "field": "years_on_list", "default_weight": 0.1},
+                {"name": "Change in Rank", "field": "change_in_rank", "default_weight": 0.1},
+            ]
         return Response(criteria)
+    
+
+class CriteriaDBView(viewsets.ModelViewSet):
+    queryset = Criteria.objects.all()
+    serializer_class = CriteriaSerializer
+
+    def list(self, request, *args, **kwargs):
+        criteria = list(self.queryset.values('name', 'field', 'default_weight'))
+        if not criteria:
+            return Response({"error": "No criteria found in the database."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(criteria, status=status.HTTP_200_OK)
 
 
 class ScrapeFortuneDataView(APIView):
@@ -155,7 +164,7 @@ class PrometheeView(viewsets.ModelViewSet):
 class TOPSISView(APIView):
     def get(self, request):
         try:
-            criteria_response = requests.get('http://127.0.0.1:8000/criteria/')
+            criteria_response = requests.get('http://127.0.0.1:8000/criteria-db/')
             if criteria_response.status_code != 200:
                 return Response({"error": "Failed to fetch criteria and weights."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
@@ -217,70 +226,3 @@ class TOPSISView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-#### BEFORE
-# class TOPSISView(APIView):
-#     def get(self, request):
-#         try:
-#             criteria_response = requests.get('http://127.0.0.1:8000/criteria/')
-#             if criteria_response.status_code != 200:
-#                 return Response({"error": "Failed to fetch criteria and weights."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
-#             criteria = criteria_response.json()
-#             criteria_names = [c['name'] for c in criteria]
-#             default_weights = np.array([c['default_weight'] for c in criteria])
-
-#             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
-#             if not entries.exists():
-#                 return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
-
-#             company_names = [entry.name for entry in entries]
-#             data = np.array([
-#                 [
-#                     float(entry.revenue or 0),
-#                     float(entry.profits or 0),
-#                     float(entry.assets or 0),
-#                     float(entry.employees or 0),
-#                     float(entry.years_on_list or 0),
-#                     float(entry.change_in_rank or 0),
-#                 ]
-#                 for entry in entries
-#             ], dtype=float)
-
-#             weights_param = request.query_params.get('weights', None)
-#             if weights_param:
-#                 try:
-#                     weights = np.array([float(w) for w in weights_param.split(',')])
-#                     if len(weights) != len(criteria_names):
-#                         return Response({
-#                             "error": f"Invalid weights. Expected {len(criteria_names)} weights but got {len(weights)}."
-#                         }, status=status.HTTP_400_BAD_REQUEST)
-
-#                     if not np.isclose(weights.sum(), 1.0):
-#                         weights = weights / weights.sum()
-
-#                 except ValueError:
-#                     return Response({"error": "Weights must be numeric values."}, status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 weights = default_weights
-
-#             all_coefficients, highest_coefficient, best_index = calculate_topsis(data, weights, company_names, criteria_names)
-
-#             sorted_indices = np.argsort(-all_coefficients)
-#             sorted_names = [company_names[i] for i in sorted_indices]
-#             sorted_coefficients = [all_coefficients[i] for i in sorted_indices]
-            
-#             result = {
-#                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
-#                 "closeness_coefficients": dict(zip(sorted_names, sorted_coefficients)),
-#                 # "criteria": criteria_names,
-#                 # "weights": weights.tolist(),
-#                 # "best_company": sorted_names[0],
-#                 # "highest_coefficient": sorted_coefficients[0],
-#             }
-
-#             return Response(result, status=status.HTTP_200_OK)
-
-#         except Exception as e:
-#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
