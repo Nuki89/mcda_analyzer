@@ -11,35 +11,51 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './ahp.component.html',
     styleUrls: ['./ahp.component.css'],
 })
-export class AhpComponent implements OnInit {
-  ahpData: any[] = []; 
-  bestCompany: any = null; 
+export class AhpComponent  {
+    ahpData: any = {};
+    topThreeCompanies: { name: string; coefficient: number }[] = []; 
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     private ahpDataService: AhpDataService,
     ) {}
 
-  ngOnInit() {
-      this.loadData();
-  }
+    async ngAfterViewInit() {
+        this.loadData();
+    }
 
-  private loadData() {
-      this.ahpDataService.getAHPdata().subscribe(
-          (data) => {
-              this.ahpData = data;
+    private loadData() {
+        this.ahpDataService.getAHPdata().subscribe(
+            (data: any) => {
+            this.ahpData = data;
+            console.log('AHP data:', this.ahpData);
+            this.calculateTopThreeCompanies();
+            console.log('Top Three Companies:', this.topThreeCompanies);
+            // this.calculateTopThreeCompanies();
+            // this.criteriaWithWeights = this.extractCriteriaWithWeights(this.topsisData);
+            // this.calculateWeightSum();
+            },
+            (error: any) => {
+            console.error('Error fetching Topsis data:', error);
+            }
+        );
+    }
 
-              if (this.ahpData.length > 0) {
-                  this.bestCompany = this.ahpData.reduce((prev, current) =>
-                      prev.score > current.score ? prev : current
-                  );
-              }
-              console.log('AHP data:', this.ahpData);
-              console.log('Best company:', this.bestCompany);
-          },
-          (error) => {
-              console.error('Error fetching AHP data:', error);
-          }
-      );
-  }
+    private calculateTopThreeCompanies() {
+        if (Array.isArray(this.ahpData.ahp_rankings) && this.ahpData.ahp_rankings.length > 0) {
+    
+            this.topThreeCompanies = this.ahpData.ahp_rankings
+                .map((ranking: any) => ({
+                    name: ranking.name,
+                    coefficient: Number(ranking.score),
+                }))
+                .sort((a: { name: string; coefficient: number }, b: { name: string; coefficient: number }) => b.coefficient - a.coefficient)
+                .slice(0, 3);
+    
+        } else {
+            console.error("AHP Rankings are missing or empty.");
+            this.topThreeCompanies = [];
+        }
+    }
+    
 }
