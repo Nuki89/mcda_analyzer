@@ -1,23 +1,37 @@
-<div class="tw-p-4 tw-bg-gray-100" *ngIf="bestCompany">
-    <h1 class="tw-text-2xl tw-font-bold tw-mb-4">AHP Results</h1>
+<div class="tw-p-4 tw-bg-gray-100" *ngIf="ahpData">
 
-    <div class="tw-mb-6">
-        <h2 class="tw-text-lg tw-font-semibold">Best Company</h2>
-        <p class="tw-text-gray-800">
-            <strong>{{ bestCompany?.name }}</strong> with a coefficient of {{ bestCompany?.score | number:'1.2-4' }}
-        </p>
+    <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden">
+        <h1 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">AHP Results</h1>
+        <div class="tw-overflow-auto">
+            <div class="tw-mb-6">
+
+                <h2 class="tw-text-lg tw-pb-2">Top 3 Companies</h2>
+                <ol class="tw-list-decimal tw-pl-6">
+                    <li *ngFor="let company of topThreeCompanies">
+                        <strong>{{ company.name }}</strong>: {{ company.coefficient | number:'1.2-4' }}
+                    </li>
+                </ol>
+
+            </div>
+        </div>
     </div>
 
-    <div class="tw-mb-6">
-        <h2 class="tw-text-lg tw-font-semibold">All Companies</h2>
-        <ul class="tw-list-disc tw-pl-6">
-            <li *ngFor="let company of ahpData">
-                {{ company.name }}: {{ company.score | number:'1.2-4' }}
-            </li>
-        </ul>
+    <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden tw-mt-4">
+        <h1 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">All Companies</h1>
+        <div class="tw-overflow-auto">
+            <div class="tw-mb-6">
+                <h2 class="tw-text-lg tw-font-semibold"></h2>
+                <ul class="tw-list-disc tw-pl-6">
+                    <li *ngFor="let company of ahpData.ahp_rankings">
+                        {{ company.name }}: {{ company.coefficient | number:'1.2-4' }}
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
+
 </div>
 
-<div *ngIf="!bestCompany" class="tw-text-center tw-mt-10">
+<div *ngIf="!ahpData" class="tw-text-center tw-mt-10">
     <p>Loading AHP data...</p>
 </div>

@@ -32,19 +32,6 @@ export class MainDashboardComponent {
 
   private loadData() {
 
-    this.topsisDataService.getTopsisdata().subscribe(
-      (data: any[]) => {
-        this.topsisData = data;
-        console.log('Data:', this.topsisData);
-        this.criteriaWithWeights = this.extractCriteriaWithWeights(this.topsisData);
-        console.log('Criteria with Weights:', this.criteriaWithWeights);
-      },
-      (error: any) => {
-        console.error('Error fetching Topsis data:', error);
-      }
-    );
-
-
     this.ahpDataService.getAHPdata().subscribe(
       (data) => {
           this.ahpData = data;
@@ -55,12 +42,24 @@ export class MainDashboardComponent {
               );
           }
           console.log('AHP data:', this.ahpData);
-          console.log('Best company:', this.bestCompany);
       },
       (error) => {
           console.error('Error fetching AHP data:', error);
       }
     );
+
+    this.topsisDataService.getTopsisdata().subscribe(
+      (data: any[]) => {
+        this.topsisData = data;
+        console.log('Topsis data:', this.topsisData);
+        this.criteriaWithWeights = this.extractCriteriaWithWeights(this.topsisData);
+        console.log('(topsis)Criteria with Weights:', this.criteriaWithWeights);
+      },
+      (error: any) => {
+        console.error('Error fetching Topsis data:', error);
+      }
+    );
+    
   }
 
   private extractCriteriaWithWeights(data: any): { name: string, weight: number }[] {
