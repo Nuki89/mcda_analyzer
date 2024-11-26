@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { DarkModeService } from '../../services/dark-mode.service';
 
 @Component({
   selector: 'app-topsis',
@@ -22,11 +23,17 @@ export class TopsisComponent {
   weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
   weightSum: number = 0;
   criteriaWithWeights: { name: string; weight: number; active: boolean }[] = [];
+  isDarkMode = false;
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     private topsisDataService: TopsisDataService,
+    public darkService: DarkModeService, 
   ) {}
+
+  get themeClass() {
+    return this.darkService.isDarkMode ? 'dark-mode' : 'light-mode';
+  }
 
   async ngAfterViewInit() {
     this.loadData();
@@ -111,6 +118,8 @@ export class TopsisComponent {
       active: true,
     }));
   }
+
+
 }
 
 
