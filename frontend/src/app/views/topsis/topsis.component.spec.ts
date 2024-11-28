@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TopsisComponent } from './topsis.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('TopsisComponent', () => {
   let component: TopsisComponent;
@@ -8,7 +9,7 @@ describe('TopsisComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TopsisComponent]
+      imports: [TopsisComponent, BrowserAnimationsModule]
     })
     .compileComponents();
     
