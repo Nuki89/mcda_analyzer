@@ -7,11 +7,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DarkModeService } from '../../services/dark-mode.service';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-topsis',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, FontAwesomeModule, MatSlideToggleModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, FontAwesomeModule, MatSlideToggleModule, MatCheckboxModule, MatSelectModule],
   templateUrl: './topsis.component.html',
   styleUrl: './topsis.component.css',
 })
@@ -20,10 +22,14 @@ export class TopsisComponent {
 
   topsisData: any = {};
   topThreeCompanies: { name: string; coefficient: number }[] = [];
+  showScores: boolean = false;
+  selectedTopCount: number = 3; 
+  topOptions: number[] = [3, 5, 10];
   weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
   weightSum: number = 0;
   criteriaWithWeights: { name: string; weight: number; active: boolean }[] = [];
   isDarkMode = false;
+  title = "Topsis";
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,

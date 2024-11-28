@@ -1,9 +1,11 @@
-<div class="tw-min-h-screen tw-flex tw-flex-col">
+<div 
+  class="tw-min-h-screen tw-flex tw-flex-col tw-bg-cover tw-bg-no-repeat"
+  style="background-image: url('../assets/images/white-background.jpg'); background-position: center; background-size: cover;">
   <app-header />
 
   <div class="tw-flex-grow tw-flex tw-flex-col tw-overflow-visible">
     <router-outlet></router-outlet>
   </div>
 
-  <app-footer />
+  <app-footer class="tw-bg-transparent"/>
 </div>

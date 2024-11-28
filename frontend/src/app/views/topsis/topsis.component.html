@@ -1,99 +1,129 @@
 <div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 tw-p-4" *ngIf="topsisData">
     <div class="lg:tw-basis-full tw-flex-auto">
 
-        <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden">
-            <h1 
-              [ngClass]="themeClass"
-              class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Topsis Results</h1>
-            <div class="tw-overflow-auto">
-                <div class="tw-mb-6">
-
-                    <h2 class="tw-text-lg tw-pb-2">Top 3 Companies</h2>
-                    <ol class="tw-list-decimal tw-pl-6">
-                        <li *ngFor="let company of topThreeCompanies">
-                            <strong>{{ company.name }}</strong>: {{ company.coefficient | number:'1.2-4' }}
-                        </li>
-                    </ol>
-
-                </div>
-            </div>
-        </div>
-        <br>
-        
-        <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden">
-            <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights</h2>
+      <div class="tw-bg-white/10 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+          <h1 
+            [ngClass]="themeClass"
+            class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">
+            {{ title }} -> Top {{ selectedTopCount }} Companies
             
-            <table class="tw-w-full tw-border-collapse tw-border tw-text-left">
-              <thead>
-                <tr class="tw-border-b">
-                  <th class="tw-py-2 tw-px-4">Status</th>
-                  <th class="tw-py-2 tw-px-4">Criterion</th>
-                  <th class="tw-py-2 tw-px-4">Weight</th>
-                  <th class="tw-py-2 tw-px-4">Adjust Weight</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let criterion of criteriaWithWeights; let i = index" class="tw-border-b">
-                  <td class="tw-py-2 tw-px-4">
-                    <mat-slide-toggle
-                    [(ngModel)]="criteriaWithWeights[i].active"
-                    (change)="onToggleChange()"
-                    [ngClass]="{
-                      'toggle-active': criteriaWithWeights[i].active,
-                      'toggle-inactive': !criteriaWithWeights[i].active
-                    }">
-                  </mat-slide-toggle>
-                  </td>
-                  <td 
-                    class="tw-py-2 tw-px-4" 
-                    [ngStyle]="!criterion.active ? {'text-decoration': 'line-through'} : {}">
-                    {{ criterion.name }}
-                  </td> 
-                  <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
-                  <td class="tw-py-2 tw-px-4">
-                    <select
-                      [disabled]="!criterion.active"
-                      [ngClass]="{
-              
-                        'tw-bg-gray-200 cursor-not-allowed': !criterion.active,
-                        'tw-cursor-pointer': criterion.active,
-                      }"
-                      class="tw-border tw-rounded tw-px-2 tw-py-1"
-                      [(ngModel)]="criteriaWithWeights[i].weight"
-                      (change)="updateWeight(i, criteriaWithWeights[i].weight)">
-                      <option *ngFor="let weight of weightOptions" [value]="weight">{{ weight }}</option>
-                    </select>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-        
-            <div class="tw-flex tw-justify-end tw-mt-4 tw-items-center" *ngIf="criteriaWithWeights?.length && criteriaWithWeights.length > 0">
-              <div class="tw-text-right tw-cursor-default">
-                <p class="tw-mr-2 tw-font-bold " [ngStyle]="{'color': weightSum === 1 ? 'green' : 'red'}">
-                  Sum of Weights: {{ weightSum | number:'1.2-2' }}
-                </p>
-                <p
-                  *ngIf="weightSum !== 1"
-                  class="tw-mr-2 tw-text-sm tw-text-red-500 tw-mt-1 tw-text-right">
-                  <fa-icon [icon]="faTriangleExclamation" class="tw-text-yellow-300"></fa-icon>
-                  The sum of weights must be 1
-                  <fa-icon [icon]="faTriangleExclamation" class="tw-text-yellow-300"></fa-icon>
-                </p>
-              </div>
-              <button
-                [disabled]="weightSum !== 1"
-                [ngClass]="{
-                  'tw-bg-sky-500 hover:tw-bg-sky-600': weightSum === 1,
-                  'tw-bg-sky-300 cursor-not-allowed': weightSum !== 1
-                }"
-                class="tw-text-white tw-px-4 tw-py-2 tw-rounded"
-                (click)="saveWeights()">
-                Save Weights
-              </button>
+            <div class="tw-flex tw-items-center tw-mt-2 tw-gap-2">
+              <span class="tw-text-sm">Show scores</span>
+                <mat-checkbox [(ngModel)]="showScores" class="tw-bg-transparent tw-border-white/20"></mat-checkbox>
+            </div>
+            
+            <!-- <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
+              <span class="tw-text-sm">Show top</span>
+              <select [(ngModel)]="selectedTopCount" class="tw-border tw-rounded tw-px-2 tw-py-1 tw-text-sm tw-w-18 tw-bg-transparent tw-border-white/30">
+                <option *ngFor="let option of topOptions" [value]="option">{{ option }}</option>
+              </select>
+
+            </div> -->
+
+            <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
+              <div class="tw-text-sm">Show top</div>
+              <mat-form-field appearance="outline" class="tw-w-20 custom-border-height">              
+                <mat-select [(value)]="selectedTopCount" class="tw-text-sm">
+                  <mat-option *ngFor="let option of topOptions" [value]="option">
+                    {{ option }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>  
             </div>
 
-        </div>
+          </h1>
+          <div class="tw-overflow-auto">
+              <div class="tw-m-4">
+                
+                  <ol class="tw-list-decimal tw-mt-2 tw-space-x-8 tw-flex tw-flex-wrap">
+                      <li *ngFor="let company of topThreeCompanies" class="tw-inline-block tw-border tw-p-2 tw-rounded-lg">
+                          <strong>{{ company.name }}</strong>
+                          <span *ngIf="showScores" class="tw-transition-opacity tw-duration-300 tw-opacity-100">
+                            : {{ company.coefficient | number:'1.2-4' }}
+                          </span>
+                      </li>
+                  </ol>
+
+              </div>
+          </div>
+      </div>
+
+      <br>
+      
+      <div class="tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+          <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights</h2>
+          
+          <table class="tw-w-full tw-text-left tw-mt-4 tw-border-white/30">
+            <thead>
+              <tr class="tw-border-b ">
+                <th class="tw-py-2 tw-px-4">Status</th>
+                <th class="tw-py-2 tw-px-4">Criterion</th>
+                <th class="tw-py-2 tw-px-4">Weight</th>
+                <th class="tw-py-2 tw-px-4">Adjust Weight</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let criterion of criteriaWithWeights; let i = index" class="tw-border-b">
+                <td class="tw-py-2 tw-px-4">
+                  <mat-slide-toggle
+                  [(ngModel)]="criteriaWithWeights[i].active"
+                  (change)="onToggleChange()"
+                  [ngClass]="{
+                    'toggle-active': criteriaWithWeights[i].active,
+                    'toggle-inactive': !criteriaWithWeights[i].active
+                  }">
+                </mat-slide-toggle>
+                </td>
+                <td 
+                  class="tw-py-2 tw-px-4" 
+                  [ngStyle]="!criterion.active ? {'text-decoration': 'line-through'} : {}">
+                  {{ criterion.name }}
+                </td> 
+                <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
+                <td class="tw-py-2 tw-px-4">
+                  <select
+                    [disabled]="!criterion.active"
+                    [ngClass]="{
+            
+                      'tw-bg-gray-200 cursor-not-allowed': !criterion.active,
+                      'tw-cursor-pointer': criterion.active,
+                    }"
+                    class="tw-border tw-rounded tw-px-2 tw-py-1"
+                    [(ngModel)]="criteriaWithWeights[i].weight"
+                    (change)="updateWeight(i, criteriaWithWeights[i].weight)">
+                    <option *ngFor="let weight of weightOptions" [value]="weight">{{ weight }}</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      
+          <div class="tw-flex tw-justify-end tw-mt-4 tw-items-center" *ngIf="criteriaWithWeights?.length && criteriaWithWeights.length > 0">
+            <div class="tw-text-right tw-cursor-default">
+              <p class="tw-mr-2 tw-font-bold " [ngStyle]="{'color': weightSum === 1 ? 'green' : 'red'}">
+                Sum of Weights: {{ weightSum | number:'1.2-2' }}
+              </p>
+              <p
+                *ngIf="weightSum !== 1"
+                class="tw-mr-2 tw-text-sm tw-text-red-500 tw-mt-1 tw-text-right">
+                <fa-icon [icon]="faTriangleExclamation" class="tw-text-yellow-300"></fa-icon>
+                The sum of weights must be 1
+                <fa-icon [icon]="faTriangleExclamation" class="tw-text-yellow-300"></fa-icon>
+              </p>
+            </div>
+            <button
+              [disabled]="weightSum !== 1"
+              [ngClass]="{
+                'tw-bg-sky-500 hover:tw-bg-sky-600': weightSum === 1,
+                'tw-bg-sky-300 cursor-not-allowed': weightSum !== 1
+              }"
+              class="tw-text-white tw-px-4 tw-py-2 tw-rounded"
+              (click)="saveWeights()">
+              Save Weights
+            </button>
+          </div>
+
+      </div>
           
     </div>
 </div>
