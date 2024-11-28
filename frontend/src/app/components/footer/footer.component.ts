@@ -13,6 +13,10 @@ import { faLinkedin } from '@fortawesome/free-brands-svg-icons';
   styleUrl: './footer.component.css'
 })
 export class FooterComponent {
+  // Fontawesome icons
   faGithub = faGithub;
   faLinkedin = faLinkedin;
+
+  // Variables
+  authorName = "Žiga Špiler";
 }

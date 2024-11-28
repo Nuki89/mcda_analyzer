@@ -1,25 +1,44 @@
-<nav class="tw-bg-slate-400 tw-py-3">
-  <div class="tw-container-fluid tw-mx-auto tw-flex tw-items-center tw-justify-between px-2">
-    <a class="tw-flex tw-items-center tw-text-white tw-font-semibold tw-text-lg" routerLink="/dashboard">
+<!-- <footer class="tw-bg-gray-100/10 tw-rounded-lg tw-shadow-lg tw-m-4 dark:tw-bg-black-300">
+  <div class="tw-w-full tw-mx-auto tw-max-w-screen-l tw-p-4 md:tw-flex md:tw-items-center md:tw-justify-between"> -->
+<nav class="tw-bg-gray-100/10 tw-rounded-lg tw-shadow-lg tw-ml-4 tw-mr-4">
+  <div class="tw-w-full tw-mx-auto tw-max-w-screen-l tw-p-4 md:tw-flex md:tw-items-center md:tw-justify-between">
+    <a 
+      class="tw-flex tw-items-center tw-text-black tw-font-semibold tw-text-lg" 
+      routerLink="/dashboard">
       <!-- <img src="../../../assets/images/mcda.jpg" alt="Logo" width="30" height="24" class="tw-mr-2">  -->
       <h1>MCDA</h1>
     </a>
 
-    <ul class="tw-flex tw-items-center tw-space-x-6 tw-text-white tw-font-medium tw-ml-8 tw-cursor-pointer">
+    <ul class="tw-flex tw-items-center tw-space-x-6 tw-text-black tw-font-medium tw-ml-8 tw-cursor-pointer">
       <li>
-        <a routerLink="/dashboard" routerLinkActive="tw-text-purple-300" class="hover:tw-text-purple-300">Dashboard</a>
+        <a 
+          routerLink="/dashboard" 
+          routerLinkActive="tw-text-purple-300" 
+          class="hover:tw-text-purple-300">Dashboard</a>
       </li>
       <li>
-        <a routerLink="/ahp" routerLinkActive="tw-text-purple-300" class="hover:tw-text-purple-300">AHP</a>
+        <a 
+          routerLink="/ahp" 
+          routerLinkActive="tw-text-purple-300" 
+          class="hover:tw-text-purple-300">AHP</a>
       </li>
       <li>
-        <a routerLink="/topsis" routerLinkActive="tw-text-purple-300" class="hover:tw-text-purple-300">Topsis</a>
+        <a 
+          routerLink="/topsis" 
+          routerLinkActive="tw-text-purple-300" 
+          class="hover:tw-text-purple-300">Topsis</a>
       </li>
       <li>
-        <a routerLink="/promethee" routerLinkActive="tw-text-purple-300" class="hover:tw-text-purple-300">Promethee</a>
+        <a 
+          routerLink="/promethee" 
+          routerLinkActive="tw-text-purple-300" 
+          class="hover:tw-text-purple-300">Promethee</a>
       </li>
       <li>
-        <a routerLink="/wsm" routerLinkActive="tw-text-purple-300" class="hover:tw-text-purple-300">WSM</a>
+        <a 
+          routerLink="/wsm" 
+          routerLinkActive="tw-text-purple-300" 
+          class="hover:tw-text-purple-300">WSM</a>
       </li>
     </ul>
 
@@ -27,7 +46,7 @@
       
       <app-dark-mode></app-dark-mode>
       <button 
-        class="tw-inline-flex tw-items-center tw-text-white tw-md:hidden focus:tw-outline-none" 
+        class="tw-inline-flex tw-items-center tw-text-black tw-md:hidden focus:tw-outline-none" 
         type="button" 
         (click)="toggleMenu()"
         aria-controls="navbar-menu" 
@@ -40,75 +59,15 @@
     </div>
 
     <div [class.tw-hidden]="!isMenuOpen" class="tw-absolute tw-top-16 tw-right-4 tw-bg-slate-400 tw-p-4 tw-rounded-md tw-shadow-md tw-z-50 tw-w-48 tw-md:tw-w-auto tw-md:tw-relative tw-md:tw-top-0 tw-md:bg-transparent tw-md:tw-p-0 tw-md:tw-shadow-none" id="navbar-menu">
-      <ul class="tw-flex tw-flex-col tw-items-start tw-space-y-4 tw-md:flex-row tw-md:space-y-0 tw-md:space-x-6 tw-text-white tw-font-medium">
+      <ul class="tw-flex tw-flex-col tw-items-start tw-space-y-4 tw-md:flex-row tw-md:space-y-0 tw-md:space-x-6 tw-text-black tw-font-medium">
         <li>
-          <a class="tw-text-white hover:tw-text-purple-300" href="#">Home</a>
+          <a class="tw-text-black hover:tw-text-purple-300" href="#">Home</a>
         </li>
         <li>
-          <a class="tw-text-white hover:tw-text-purple-300" href="#">Link</a>
+          <a class="tw-text-black hover:tw-text-purple-300" href="#">Link</a>
         </li>
       </ul>
     </div>
 
   </div>
 </nav>
-
-
-<!-- <nav class="tw-bg-slate-400 tw-py-3">
-  <div class="tw-container tw-mx-auto tw-flex tw-items-center tw-justify-between tw-flex-wrap">
-    <a class="tw-flex tw-items-center tw-text-white tw-font-semibold tw-text-lg" href="#">
-      <img src="../../../assets/images/mcda.jpg" alt="Logo" width="30" height="24" class="tw-mr-2"> MCDA
-    </a>
-    <button 
-      class="tw-inline-flex tw-items-center tw-p-2 tw-text-white tw-md:hidden focus:tw-outline-none" 
-      type="button" 
-      (click)="toggleMenu()"
-      aria-controls="navbar-menu" 
-      aria-expanded="false"
-    >
-      <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-      </svg>
-    </button>
-    <div [class.tw-hidden]="!isMenuOpen" class="tw-w-full tw-md:flex tw-md:items-center tw-md:w-auto tw-mt-4 tw-md:mt-0" id="navbar-menu">
-      <ul class="tw-flex tw-flex-col tw-items-center tw-space-y-4 tw-md:flex-row tw-md:space-y-0 tw-md:space-x-6 tw-md:ml-4 tw-text-white tw-font-medium">
-        <li>
-          <a class="tw-text-white hover:tw-text-purple-300" href="#">Home</a>
-        </li>
-        <li>
-          <a class="tw-text-white hover:tw-text-purple-300" href="#">Link</a>
-        </li>
-      </ul>
-      <form class="tw-flex tw-items-center tw-mt-4 tw-md:mt-0 tw-ml-auto" role="search">
-        <input class="tw-bg-gray-800 tw-text-white tw-placeholder-gray-400 tw-px-3 tw-py-1 tw-rounded-md tw-border tw-border-gray-600 focus:tw-outline-none focus:tw-border-purple-400" 
-               type="search" placeholder="Search" aria-label="Search">
-        <button class="tw-ml-2 tw-px-4 tw-py-1 tw-bg-purple-700 tw-text-white tw-rounded-md tw-font-semibold hover:tw-bg-purple-600 focus:tw-outline-none" type="submit">Search</button>
-      </form>
-    </div>
-  </div>
-</nav> -->
-
-<!-- #### SMTH -->
-<!-- <nav class="navbar navbar-expand-lg" style="background-color: #3c2c54;">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">
-      <img src="../../../assets/images/mcda.jpg" alt="Bootstrap" width="30" height="24">
-    </a>
-    <h1>
-      MCDA
-    </h1>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent" >
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item" >
-          <a class="nav-link" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav> -->
