@@ -7,11 +7,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DarkModeService } from '../../services/dark-mode.service';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+
 
 @Component({
   selector: 'app-topsis',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, FontAwesomeModule, MatSlideToggleModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, FontAwesomeModule, MatSlideToggleModule, MatCheckboxModule],
   templateUrl: './topsis.component.html',
   styleUrl: './topsis.component.css',
 })

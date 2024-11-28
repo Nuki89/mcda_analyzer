@@ -1,7 +1,7 @@
 <div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 tw-p-4" *ngIf="topsisData">
     <div class="lg:tw-basis-full tw-flex-auto">
 
-      <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden tw-bg-purple-200">
+      <div class="tw-bg-white/10 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
           <h1 
             [ngClass]="themeClass"
             class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">
@@ -9,7 +9,7 @@
             
             <div class="tw-flex tw-items-center tw-mt-2 tw-gap-2">
               <span class="tw-text-sm">Show scores</span>
-              <input type="checkbox" [(ngModel)]="showScores" class="tw-border-gray-300 tw-rounded tw-w-4 tw-h-4 tw-accent-blue-500">
+                <mat-checkbox [(ngModel)]="showScores" class="tw-bg-transparent tw-border-white/20"></mat-checkbox>
             </div>
             
             <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
@@ -38,12 +38,12 @@
 
       <br>
       
-      <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden">
+      <div class="tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
           <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights</h2>
           
-          <table class="tw-w-full tw-text-left tw-mt-4">
+          <table class="tw-w-full tw-text-left tw-mt-4 tw-border-white/30">
             <thead>
-              <tr class="tw-border-b">
+              <tr class="tw-border-b ">
                 <th class="tw-py-2 tw-px-4">Status</th>
                 <th class="tw-py-2 tw-px-4">Criterion</th>
                 <th class="tw-py-2 tw-px-4">Weight</th>
