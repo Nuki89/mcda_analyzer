@@ -1,120 +1,71 @@
 <div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 tw-p-4">
-
     <div class="lg:tw-basis-1/4 tw-flex-auto">
-      <button
-        routerLink="/ahp"
-        class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 tw-border tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-100 hover:tw-border-purple-300 focus:tw-outline-none">
-        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">AHP</h5>
-        <!-- <p class="tw-text-gray-600">{{ bestCompany?.name }} = {{ bestCompany?.score | number:'1.2-4' }}</p> -->
+      <button routerLink="/ahp" class="btn-card">
+        <h5>AHP</h5>
       </button>
     </div>
   
     <div class="lg:tw-basis-1/4 tw-flex-auto">
-      <button
-        routerLink="/topsis"
-        class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 tw-border tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-100 hover:tw-border-purple-300 focus:tw-outline-none">
-        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">Topsis</h5>
-        <!-- <p class="tw-text-gray-600">{{ topsisData.best_company }} = {{ topsisData.highest_coefficient | number:'1.2-4' }}</p> -->
+      <button routerLink="/topsis" class="btn-card">
+        <h5>Topsis</h5>
       </button>
     </div>
   
     <div class="lg:tw-basis-1/4 tw-flex-auto">
-      <button
-        routerLink="/promethee"
-        class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 tw-border tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-100 hover:tw-border-purple-300 focus:tw-outline-none">
-        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">Promethee</h5>
-        <p class="tw-text-gray-600">Promethee input</p>
+      <button routerLink="/promethee" class="btn-card">
+        <h5>Promethee</h5>
       </button>
     </div>
   
     <div class="lg:tw-basis-1/4 tw-flex-auto">
-      <button
-        routerLink="/wsm"
-        class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 tw-border tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-100 hover:tw-border-purple-300 focus:tw-outline-none">
-        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">WSM</h5>
-        <p class="tw-text-gray-600">WSM input</p>
+      <button routerLink="/wsm" class="btn-card">
+        <h5>WSM</h5>
       </button>
     </div>
 </div>
-  
 
 <div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 tw-p-4">
-    <div class="lg:tw-basis-full tw-flex-auto">
-        <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-scroll tw-h-[650px]">
+    <div class="lg:tw-basis-full tw-flex-auto ">
+        <div class="tw-bg-white/20 tw-backdrop-blur-md tw-shadow-lg tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-border-white/10  tw-h-full">
             <h5 class="tw-text-lg tw-border-b tw-pb-2">Scraped data</h5>
-            <div class="tw-overflow-auth">
+            <div class="tw-overflow-y-scroll tw-scrollbar-custom tw-mt-2">
                 <app-scraping-data></app-scraping-data>
             </div>
         </div>
     </div>
 </div>
 
-<!-- <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-    <label class="form-check-label" for="flexSwitchCheckDefault"></label>
-</div> -->
-  
-
-
 <!-- <div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 tw-p-4">
-    <div class="lg:tw-basis-1/4 tw-flex-auto">
-        <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 border">
-            <h5 class="tw-text-lg tw-border-b tw-pb-2">AHP button</h5>
-            <p>AHP input</p>
-        </div>
-    </div>
-    <div class="lg:tw-basis-1/4 tw-flex-auto">
-        <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 border">
-            <h5 class="tw-text-lg tw-border-b tw-pb-2">Topsis</h5>
-            <p>Topsis input</p>
-        </div>
-    </div>
-    <div class="lg:tw-basis-1/4 tw-flex-auto">
-        <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 border">
-            <h5 class="tw-text-lg tw-border-b tw-pb-2">Promethee</h5>
-            <p>Promethee input</p>
-        </div>
-    </div>
-    <div class="lg:tw-basis-1/4 tw-flex-auto">
-        <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-4 border">
-            <h5 class="tw-text-lg tw-border-b tw-pb-2">WSM</h5>
-            <p>WSM input</p>
-        </div>
-    </div>
-</div> -->
 
-<!-- <div class="flex flex-col flex-row gap-6 p-4">
-    <div class="basis-2-8 flex-auto">
-        <div class="box rounded">
-        <h5 class="box-header">AHP button</h5>
-        <p>AHP input</p>
-        </div>
+    <div class="lg:tw-basis-1/4 tw-flex-auto">
+      <button
+        routerLink="/ahp"
+        class="tw-bg-white/20 tw-backdrop-blur-md tw-shadow-lg tw-rounded-lg tw-border tw-border-white/10 tw-p-4 tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-300/20 hover:tw-border-purple-300/10 focus:tw-outline-none">
+        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">AHP</h5>
+      </button>
     </div>
-    <div class="basis-2-8 flex-auto">
-        <div class="box">
-        <h5 class="box-header">Topsis</h5>
-        <p>Topsis input</p>
-        </div>
+  
+    <div class="lg:tw-basis-1/4 tw-flex-auto">
+      <button
+        routerLink="/topsis"
+        class="tw-bg-white/20 tw-backdrop-blur-md tw-shadow-lg tw-rounded-lg tw-border tw-border-white/10 tw-p-4 tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-300/20 hover:tw-border-purple-300/10 focus:tw-outline-none">
+        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">Topsis</h5>
+      </button>
     </div>
-    <div class="basis-2-8 flex-auto">
-        <div class="box">
-        <h5 class="box-header">Promethee</h5>
-        <p>Promethee input</p>
-        </div>
+  
+    <div class="lg:tw-basis-1/4 tw-flex-auto">
+      <button
+        routerLink="/promethee"
+        class="tw-bg-white/20 tw-backdrop-blur-md tw-shadow-lg tw-rounded-lg tw-border tw-border-white/10 tw-p-4 tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-300/20 hover:tw-border-purple-300/10 focus:tw-outline-none">
+        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">Promethee</h5>
+      </button>
     </div>
-    <div class="basis-2-8 flex-auto">
-        <div class="box">
-        <h5 class="box-header">WSM</h5>
-        <p>WSM input</p>
-        </div>
-    </div>
-</div>
-
-<div class="flex flex-col flex-row gap-6 p-2">
-    <div class="basis-6-6 flex-auto">
-        <div class="box">
-        <h5 class="box-header">Scraped data</h5>
-        <app-scraping-data></app-scraping-data>
-        </div>
+  
+    <div class="lg:tw-basis-1/4 tw-flex-auto">
+      <button
+        routerLink="/wsm"
+        class="tw-bg-white/20 tw-backdrop-blur-md tw-shadow-lg tw-rounded-lg tw-border tw-border-white/10 tw-p-4 tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-300/20 hover:tw-border-purple-300/10 focus:tw-outline-none">
+        <h5 class="tw-text-lg tw-font-semibold tw-text-gray-800">WSM</h5>        
+      </button>
     </div>
 </div> -->

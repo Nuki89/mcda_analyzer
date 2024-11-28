@@ -1,37 +1,12 @@
-/* .flex {
-    display: flex;
-  }
-  .flex-col {
-    flex-direction: column;
-  }
-  .flex-row {
-    flex-direction: row;
-  }
-  .gap-6 {
-    gap: 1.5rem;
-  }
-  .flex-auto {
-    flex: 1 1 auto;
-  }
-  .basis-2-6 {
-    flex-basis: 33.33%;
-  }
-  .basis-3-6 {
-    flex-basis: 50%;
-  }
-  .basis-6-6 {
-    flex-basis: 100%;
-  }
-  .box {
-    background-color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-    border: 1px solid #e2e8f0;
-  }
-  .box-header {
-    font-size: 1.125rem;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.5rem;
-  } */
-   
+.btn-card {
+  @apply tw-bg-white/20 tw-backdrop-blur-md tw-shadow-lg tw-rounded-lg tw-border tw-border-white/10 tw-p-4 tw-w-full tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-transition-all hover:tw-bg-purple-300/20 hover:tw-border-purple-300/10 focus:tw-outline-none;
+}
+
+.btn-card h5 {
+  @apply tw-text-lg tw-font-semibold tw-text-gray-800;
+}
+
+.tw-scrollbar-custom::-webkit-scrollbar {
+  background-color: transparent;
+  display: none;
+}
