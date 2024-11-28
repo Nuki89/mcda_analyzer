@@ -20,10 +20,14 @@ export class TopsisComponent {
 
   topsisData: any = {};
   topThreeCompanies: { name: string; coefficient: number }[] = [];
+  showScores: boolean = false;
+  selectedTopCount: number = 3; 
+  topOptions: number[] = [3, 5, 10];
   weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
   weightSum: number = 0;
   criteriaWithWeights: { name: string; weight: number; active: boolean }[] = [];
   isDarkMode = false;
+  title = "Topsis";
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
