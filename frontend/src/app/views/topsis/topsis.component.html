@@ -12,11 +12,23 @@
                 <mat-checkbox [(ngModel)]="showScores" class="tw-bg-transparent tw-border-white/20"></mat-checkbox>
             </div>
             
-            <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
+            <!-- <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
               <span class="tw-text-sm">Show top</span>
-              <select [(ngModel)]="selectedTopCount" class="tw-border tw-rounded tw-px-2 tw-py-1 tw-text-sm tw-w-18">
+              <select [(ngModel)]="selectedTopCount" class="tw-border tw-rounded tw-px-2 tw-py-1 tw-text-sm tw-w-18 tw-bg-transparent tw-border-white/30">
                 <option *ngFor="let option of topOptions" [value]="option">{{ option }}</option>
               </select>
+
+            </div> -->
+
+            <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
+              <div class="tw-text-sm">Show top</div>
+              <mat-form-field appearance="outline" class="tw-w-20 custom-border-height">              
+                <mat-select [(value)]="selectedTopCount" class="tw-text-sm">
+                  <mat-option *ngFor="let option of topOptions" [value]="option">
+                    {{ option }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>  
             </div>
 
           </h1>
