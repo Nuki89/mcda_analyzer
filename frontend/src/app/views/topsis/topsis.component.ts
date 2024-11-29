@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Inject } from '@angular/core';
 import { TopsisDataService } from '../../services/topsis-data.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
   imports: [CommonModule, HttpClientModule, FormsModule, FontAwesomeModule, MatSlideToggleModule, MatCheckboxModule, MatSelectModule],
   templateUrl: './topsis.component.html',
   styleUrl: './topsis.component.css',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class TopsisComponent {
   faTriangleExclamation = faTriangleExclamation;

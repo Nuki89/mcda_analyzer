@@ -81,18 +81,23 @@
                 </td> 
                 <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
                 <td class="tw-py-2 tw-px-4">
-                  <select
-                    [disabled]="!criterion.active"
-                    [ngClass]="{
-            
-                      'tw-bg-gray-200 cursor-not-allowed': !criterion.active,
-                      'tw-cursor-pointer': criterion.active,
-                    }"
-                    class="tw-border tw-rounded tw-px-2 tw-py-1"
-                    [(ngModel)]="criteriaWithWeights[i].weight"
-                    (change)="updateWeight(i, criteriaWithWeights[i].weight)">
-                    <option *ngFor="let weight of weightOptions" [value]="weight">{{ weight }}</option>
-                  </select>
+
+                  <mat-form-field appearance="outline" class="tw-w-20 custom-border-height">
+                    <mat-select
+                      [(ngModel)]="criteriaWithWeights[i].weight"
+                      [disabled]="!criterion.active"
+                      [ngClass]="{
+                        'tw-bg-gray-200 cursor-not-allowed': !criterion.active,
+                        'tw-cursor-pointer': criterion.active
+                      }"
+                      class="tw-text-sm"
+                      (selectionChange)="updateWeight(i, criteriaWithWeights[i].weight)">
+                      <mat-option *ngFor="let weight of weightOptions" [value]="weight">
+                        {{ weight }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                
                 </td>
               </tr>
             </tbody>
