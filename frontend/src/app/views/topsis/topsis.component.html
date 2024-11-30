@@ -47,10 +47,8 @@
               </div>
           </div>
       </div>
-
-      <br>
       
-      <div class="tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+      <div class="tw-mt-4 tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
           <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights</h2>
           
           <table class="tw-w-full tw-text-left tw-mt-4 tw-border-white/30">
@@ -105,7 +103,7 @@
       
           <div class="tw-flex tw-justify-end tw-mt-4 tw-items-center" *ngIf="criteriaWithWeights?.length && criteriaWithWeights.length > 0">
             <div class="tw-text-right tw-cursor-default">
-              <p class="tw-mr-2 tw-font-bold " [ngStyle]="{'color': weightSum === 1 ? 'green' : 'red'}">
+              <p class="tw-mr-4 tw-font-bold " [ngStyle]="{'color': weightSum === 1 ? 'green' : 'red'}">
                 Sum of Weights: {{ weightSum | number:'1.2-2' }}
               </p>
               <p
@@ -119,10 +117,10 @@
             <button
               [disabled]="weightSum !== 1"
               [ngClass]="{
-                'tw-bg-sky-500 hover:tw-bg-sky-600': weightSum === 1,
-                'tw-bg-sky-300 cursor-not-allowed': weightSum !== 1
+                'tw-bg-violet-500 hover:tw-bg-violet-600': weightSum === 1,
+                'tw-bg-violet-300 cursor-not-allowed': weightSum !== 1
               }"
-              class="tw-text-white tw-px-4 tw-py-2 tw-rounded"
+              class="tw-text-black tw-px-4 tw-py-2 tw-rounded"
               (click)="saveWeights()">
               Save Weights
             </button>
