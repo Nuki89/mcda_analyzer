@@ -1,14 +1,38 @@
-<div class="tw-p-4 tw-bg-gray-100" *ngIf="ahpData">
+<div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 tw-p-4" *ngIf="ahpData">
+    <div class="lg:tw-basis-full tw-flex-auto">
 
-    <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden">
-        <h1 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">AHP Results</h1>
+    <div class="tw-bg-white/10 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+        <h1 
+          [ngClass]="themeClass"
+          class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">
+          {{ title }} -> Top {{ selectedTopCount }} Companies
+          
+          <div class="tw-flex tw-items-center tw-mt-2 tw-gap-2">
+            <span class="tw-text-sm">Show scores</span>
+              <mat-checkbox [(ngModel)]="showScores" class="tw-bg-transparent tw-border-white/20"></mat-checkbox>
+          </div>
+
+          <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
+            <div class="tw-text-sm">Show top</div>
+            <mat-form-field appearance="outline" class="tw-w-20 custom-border-height">              
+              <mat-select [(value)]="selectedTopCount" class="tw-text-sm">
+                <mat-option *ngFor="let option of topOptions" [value]="option">
+                  {{ option }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>  
+          </div>
+
+        </h1>
         <div class="tw-overflow-auto">
-            <div class="tw-mb-6">
-
-                <h2 class="tw-text-lg tw-pb-2">Top 3 Companies</h2>
-                <ol class="tw-list-decimal tw-pl-6">
-                    <li *ngFor="let company of topThreeCompanies">
-                        <strong>{{ company.name }}</strong>: {{ company.coefficient | number:'1.2-4' }}
+            <div class="tw-m-4">
+              
+                <ol class="tw-list-decimal tw-mt-2 tw-space-x-8 tw-flex tw-flex-wrap">
+                    <li *ngFor="let company of topThreeCompanies" class="tw-inline-block tw-border tw-p-2 tw-rounded-lg">
+                        <strong>{{ company.name }}</strong>
+                        <span *ngIf="showScores" class="tw-transition-opacity tw-duration-300 tw-opacity-100">
+                          : {{ company.coefficient | number:'1.2-4' }}
+                        </span>
                     </li>
                 </ol>
 
@@ -16,7 +40,7 @@
         </div>
     </div>
 
-    <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden tw-mt-4">
+    <!-- <div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-2 tw-border tw-overflow-hidden tw-mt-4">
         <h1 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">All Companies</h1>
         <div class="tw-overflow-auto">
             <div class="tw-mb-6">
@@ -28,7 +52,7 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </div> -->
 
 </div>
 

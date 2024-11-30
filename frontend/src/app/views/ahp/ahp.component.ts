@@ -3,22 +3,34 @@ import { AhpDataService } from '../../services/ahp-data.service';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { DarkModeService } from '../../services/dark-mode.service';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
     selector: 'app-ahp',
     standalone: true,
-    imports: [CommonModule, HttpClientModule, FormsModule],
+    imports: [CommonModule, HttpClientModule, FormsModule, MatCheckboxModule, MatSelectModule],
     templateUrl: './ahp.component.html',
     styleUrls: ['./ahp.component.css'],
 })
 export class AhpComponent  {
     ahpData: any = {};
     topThreeCompanies: { name: string; coefficient: number }[] = []; 
+    showScores: boolean = false;
+    selectedTopCount: number = 3; 
+    topOptions: number[] = [3, 5, 10];
+    title = "AHP";
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
     private ahpDataService: AhpDataService,
+    public darkService: DarkModeService, 
     ) {}
+
+    get themeClass() {
+        return this.darkService.isDarkMode ? 'dark-mode' : 'light-mode';
+    }
 
     async ngAfterViewInit() {
         this.loadData();
