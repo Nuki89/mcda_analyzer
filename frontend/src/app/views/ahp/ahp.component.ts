@@ -86,106 +86,111 @@ export class AhpComponent  {
         }
     }
 
-    // saveWeights() {
-    //     const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
-    
-    //     if (activeCriteria.length === 0) {
-    //         alert('At least one criterion must be active.');
-    //         return;
-    //     }
-    
-    //     const weights = activeCriteria.map(c => c.weight);
-    //     const sumOfWeights = weights.reduce((a, b) => a + b, 0);
-    //     const roundedSum = Math.round(sumOfWeights * 1000) / 1000;
-    
-    //     if (roundedSum !== 1) {
-    //         alert(`Weights must sum to 1. Current sum: ${roundedSum}`);
-    //         return;
-    //     }
-    
-    //     const payload = {
-    //         selected_criteria: activeCriteria.map(c => c.name),
-    //         weights: weights,
-    //     };
-    
-    //     this.http.post('http://127.0.0.1:8000/ahp/', payload).subscribe(
-    //         (data: any) => {
-    //             console.log('Response:', data);
-    //             this.ahpData = data;
-    //             this.calculateTopThreeCompanies();
-    //         },
-    //         (error) => {
-    //             console.error('Error:', error);
-    //         }
-    //     );
-    // }
-    
     saveWeights() {
-        // !!!!!! FOUND SECURITY ISSUES HERE IN URL !!!!!!
         const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
-    
+      
         if (activeCriteria.length === 0) {
           alert('At least one criterion must be active.');
           return;
         }
-    
-        const selectedCriteria = activeCriteria.map(c => c.name).join(',');
+      
+        const selectedCriteria = activeCriteria.map(c => c.name);
         const weights = activeCriteria.map(c => c.weight);
-    
+      
         const sumOfWeights = weights.reduce((a, b) => a + b, 0);
         const roundedSum = Math.round(sumOfWeights * 1000) / 1000;
-    
+      
         if (roundedSum !== 1) {
           alert(`Weights must sum to 1. Current sum: ${roundedSum}`);
           return;
         }
-    
-        const queryParam = `selected_criteria=${selectedCriteria}&weights=${weights.join(',')}`;
-    
+      
+        const payload = {
+          selected_criteria: selectedCriteria,
+          weights: weights
+        };
+      
         this.http
-          .get(`http://127.0.0.1:8000/ahp/?${queryParam}`)
-          .subscribe(
-            (data: any) => {
-              this.ahpData = data;
-              this.calculateTopThreeCompanies(); 
-            },
-            (error) => {
-              console.error('Error updating weights and criteria:', error);
-            }
-        );
+            .post('http://127.0.0.1:8000/ahp/', payload)
+            .subscribe(
+                (data: any) => {
+                    this.ahpData = data;
+                    this.calculateTopThreeCompanies();
 
-        // const payload = {
-        //     selected_criteria: selectedCriteria,
-        //     weights: weights,
-        //   };
-          
-        // this.http
-        // .post('http://127.0.0.1:8000/ahp/', payload)
-        // .subscribe(
-        //     (data: any) => {
-        //     this.ahpData = data;
-        //     this.calculateTopThreeCompanies(); 
-        //     },
-        //     (error) => {
-        //     console.error('Error updating weights and criteria:', error);
-        //     }
-        // );
-        // }
+                    // Step 2: Save the results to backend
+                    const savePayload = {
+                        criteria_with_weights: data.criteria_with_weights,
+                        ahp_rankings: data.ahp_rankings,
+                    };
+            
+                    // NOT WORKING
+                    // this.http
+                    //     .post('http://127.0.0.1:8000/ahp-results/save_ahp/', savePayload)
+                    //     .subscribe(
+                    //     (saveData: any) => {
+                    //         console.log('Results saved successfully:', saveData);
+                    //     },
+                    //     (saveError) => {
+                    //         console.error('Error saving AHP results:', saveError);
+                    //     }
+                    // );
+                },
+                (error) => {
+                console.error('Error updating weights and criteria:', error);
+                }
+            );  
     }
+      
+    // OLD VERSION WITHOUT SECURITY
+    // saveWeights() {
+    //     // !!!!!! FOUND SECURITY ISSUES HERE IN URL !!!!!!
+    //     const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
+    
+    //     if (activeCriteria.length === 0) {
+    //       alert('At least one criterion must be active.');
+    //       return;
+    //     }
+    
+    //     const selectedCriteria = activeCriteria.map(c => c.name).join(',');
+    //     const weights = activeCriteria.map(c => c.weight);
+    
+    //     const sumOfWeights = weights.reduce((a, b) => a + b, 0);
+    //     const roundedSum = Math.round(sumOfWeights * 1000) / 1000;
+    
+    //     if (roundedSum !== 1) {
+    //       alert(`Weights must sum to 1. Current sum: ${roundedSum}`);
+    //       return;
+    //     }
+    
+    //     const queryParam = `selected_criteria=${selectedCriteria}&weights=${weights.join(',')}`;
+    
+    //     this.http
+    //       .get(`http://127.0.0.1:8000/ahp/?${queryParam}`)
+    //       .subscribe(
+    //         (data: any) => {
+    //           this.ahpData = data;
+    //           this.calculateTopThreeCompanies(); 
+    //         },
+    //         (error) => {
+    //           console.error('Error updating weights and criteria:', error);
+    //         }
+    //     );
+
+    // }
 
     updateWeight(index: number, weight: number) {
         this.criteriaWithWeights[index].weight = parseFloat(weight.toString()) || 0;
         this.calculateWeightSum();
-      }
+    }
 
     private calculateWeightSum() {
         const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
         this.weightSum = activeCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);
         this.weightSum = Math.round(this.weightSum * 1000) / 1000;
-      }
+    }
 
     onToggleChange() {
         this.calculateWeightSum();
-      }
+    }
     
 }

@@ -78,9 +78,9 @@ def process_weights(weights_param, default_weights, num_criteria):
         elif len(weights) > num_criteria:
             raise ValidationError(f"Too many weights provided. Expected {num_criteria} but got {len(weights)}.")
         if not np.isclose(weights.sum(), 1.0):
-            weights = weights / weights.sum()  # Normalize weights
+            weights = weights / weights.sum() 
     else:
-        weights = default_weights  # Use default weights
+        weights = default_weights  
     return weights
 
 # AHP-Specific Function
