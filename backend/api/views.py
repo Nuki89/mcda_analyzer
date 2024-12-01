@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -110,58 +111,95 @@ class CachedFortuneDataView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-#SHARED FUNCTIONS ADDED
-class AHPView(viewsets.ModelViewSet):
-    queryset = AHPResult.objects.all()
-    serializer_class = AHPResultSerializer
-
-    def list(self, request, *args, **kwargs):
+class AHPView(APIView):
+    def get(self, request, *args, **kwargs):
         try:
-            # Fetch and process criteria
             criteria = fetch_criteria('http://127.0.0.1:8000/criteria-db/')
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
 
-            # Fetch company data
             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
             if not entries.exists():
                 return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+
             company_names = [entry.name for entry in entries]
-            data = np.array([
+
+            data_matrix = np.array([
+                [getattr(entry, c['field'], 0) or 0 for c in criteria]
+                for entry in entries
+            ], dtype=float)
+            weights = default_weights
+            scores = calculate_ahp(data_matrix, weights, company_names, criteria_names)
+
+            result = {
+                "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+                "ahp_rankings": scores,
+            }
+            
+            return Response(result, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            selected_criteria = data.get('selected_criteria', [])
+            weights = data.get('weights', [])
+
+            if not selected_criteria or not weights:
+                return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            criteria = fetch_criteria('http://127.0.0.1:8000/criteria-db/')
+            criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
+
+            entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
+            if not entries.exists():
+                return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+
+            company_names = [entry.name for entry in entries]
+            data_matrix = np.array([
                 [getattr(entry, c['field'], 0) or 0 for c in criteria]
                 for entry in entries
             ], dtype=float)
 
-            # Process weights
-            weights_param = request.query_params.get('weights', None)
-            weights = process_weights(weights_param, default_weights, len(criteria_names))
+            if len(weights) != len(criteria_names):
+                return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Calculate AHP scores
-            scores = calculate_ahp(data, weights, company_names, criteria_names)
+            weights = list(map(float, weights))
+            scores = calculate_ahp(data_matrix, weights, company_names, criteria_names)
 
-            # Prepare response
             result = {
                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
                 "ahp_rankings": scores,
             }
             return Response(result, status=status.HTTP_200_OK)
 
-        except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# SHARED FUNCTIONS ADDED
+# NOT WORKING...yet
+class AHPResultViewSet(viewsets.ModelViewSet):
+    queryset = AHPResult.objects.all()
+    serializer_class = AHPResultSerializer
+
+    @action(detail=False, methods=['post'])
+    def save_ahp(self, request):
+        data = request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class TOPSISView(APIView):
     def get(self, request):
         try:
-            # Fetch and process criteria
             criteria = fetch_criteria('http://127.0.0.1:8000/criteria-db/')
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
 
-            # Fetch company data
             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
             if not entries.exists():
                 return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
@@ -171,14 +209,11 @@ class TOPSISView(APIView):
                 for entry in entries
             ], dtype=float)
 
-            # Process weights
             weights_param = request.query_params.get('weights', None)
             weights = process_weights(weights_param, default_weights, len(criteria_names))
 
-            # Calculate TOPSIS scores
             sorted_names, sorted_coefficients = calculate_topsis(data, weights, company_names, criteria_names)
 
-            # Prepare response
             result = {
                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
                 "closeness_coefficients": dict(zip(sorted_names, sorted_coefficients)),
@@ -203,159 +238,3 @@ class PrometheeView(viewsets.ModelViewSet):
     def post(self, request):
         # Placeholder for PROMETHEE calculation logic
         return Response({"message": "PROMETHEE calculation not implemented yet"}, status=status.HTTP_501_NOT_IMPLEMENTED)
-
-
-# WORKS
-# class TOPSISView(APIView):
-#     def get(self, request):
-#         try:
-#             criteria_response = requests.get('http://127.0.0.1:8000/criteria-db/')
-#             if criteria_response.status_code != 200:
-#                 return Response({"error": "Failed to fetch criteria and weights."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
-#             criteria = criteria_response.json()
-            
-#             selected_criteria_param = request.query_params.get('selected_criteria', None)
-#             if selected_criteria_param:
-#                 selected_criteria = selected_criteria_param.split(',')
-#                 criteria = [c for c in criteria if c['name'] in selected_criteria]
-
-#             if not criteria:
-#                 return Response({"error": "No valid criteria selected."}, status=status.HTTP_400_BAD_REQUEST)
-
-#             criteria_names = [c['name'] for c in criteria]
-#             default_weights = np.array([c['default_weight'] for c in criteria])
-
-#             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
-#             if not entries.exists():
-#                 return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
-            
-#             company_names = [entry.name for entry in entries]
-
-#             data = np.array([
-#                 [
-#                     getattr(entry, c['field'], 0) or 0 
-#                     for c in criteria
-#                 ]
-#                 for entry in entries
-#             ], dtype=float)
-
-#             weights_param = request.query_params.get('weights', None)
-#             if weights_param:
-#                 try:
-#                     weights = np.array([float(w) for w in weights_param.split(',')])
-#                     if len(weights) != len(criteria_names):
-#                         return Response({
-#                             "error": f"Invalid weights. Expected {len(criteria_names)} weights but got {len(weights)}."
-#                         }, status=status.HTTP_400_BAD_REQUEST)
-
-#                     if not np.isclose(weights.sum(), 1.0):
-#                         weights = weights / weights.sum()
-#                 except ValueError:
-#                     return Response({"error": "Weights must be numeric values."}, status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 weights = default_weights
-
-#             all_coefficients, highest_coefficient, best_index = calculate_topsis(data, weights, company_names, criteria_names)
-
-#             sorted_indices = np.argsort(-all_coefficients)
-#             sorted_names = [company_names[i] for i in sorted_indices]
-#             sorted_coefficients = [all_coefficients[i] for i in sorted_indices]
-            
-#             result = {
-#                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
-#                 "closeness_coefficients": dict(zip(sorted_names, sorted_coefficients)),
-#             }
-
-#             return Response(result, status=status.HTTP_200_OK)
-
-#         except Exception as e:
-#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-# WORKS
-# class AHPView(viewsets.ModelViewSet):
-#     queryset = AHPResult.objects.all()
-#     serializer_class = AHPResultSerializer
-
-#     def list(self, request, *args, **kwargs):
-#         try:
-#             # Step 1: Fetch criteria from an external API
-#             criteria_response = requests.get('http://127.0.0.1:8000/criteria-db/')
-#             if criteria_response.status_code != 200:
-#                 return Response({"error": "Failed to fetch criteria and weights."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
-#             criteria = criteria_response.json()
-#             print("DEBUG: Available criteria fetched from API:", criteria)
-
-#             # Step 2: Handle selected criteria from query parameters
-#             selected_criteria_param = request.query_params.get('selected_criteria', None)
-#             if selected_criteria_param:
-#                 selected_criteria = selected_criteria_param.split(',')
-#                 # Case-insensitive filtering
-#                 criteria = [c for c in criteria if c['name'].lower() in map(str.lower, selected_criteria)]
-#             else:
-#                 selected_criteria = [c['name'] for c in criteria]  # Default to all criteria
-
-#             print("DEBUG: Selected criteria from query params:", selected_criteria)
-#             print("DEBUG: Filtered criteria after processing:", [c['name'] for c in criteria])
-
-#             # Validate if all selected criteria are present
-#             if len(criteria) != len(selected_criteria):
-#                 missing_criteria = set(selected_criteria) - set(c['name'] for c in criteria)
-#                 return Response({
-#                     "error": f"The following criteria were not found: {', '.join(missing_criteria)}"
-#                 }, status=status.HTTP_400_BAD_REQUEST)
-
-#             criteria_names = [c['name'] for c in criteria]
-#             default_weights = np.array([c['default_weight'] for c in criteria])
-
-#             # Step 3: Handle weights from query parameters
-#             weights_param = request.query_params.get('weights', None)
-#             if weights_param:
-#                 try:
-#                     # Parse weights
-#                     weights = np.array([float(w) for w in weights_param.split(',')])
-
-#                     # Handle cases where fewer weights are provided
-#                     if len(weights) < len(criteria_names):
-#                         # Use default weights for missing criteria
-#                         weights = np.concatenate((weights, default_weights[len(weights):]))
-#                     elif len(weights) > len(criteria_names):
-#                         return Response({
-#                             "error": f"Too many weights provided. Expected at most {len(criteria_names)} but got {len(weights)}."
-#                         }, status=status.HTTP_400_BAD_REQUEST)
-
-#                     # Normalize weights
-#                     if not np.isclose(weights.sum(), 1.0):
-#                         weights = weights / weights.sum()
-
-#                 except ValueError:
-#                     return Response({"error": "Weights must be numeric values."}, status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 weights = default_weights  # Default to all criteria's default weights
-
-#             # Step 4: Fetch company data
-#             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
-#             if not entries.exists():
-#                 return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
-
-#             company_names = [entry.name for entry in entries]
-#             data = np.array([
-#                 [getattr(entry, c['field'], 0) or 0 for c in criteria]
-#                 for entry in entries
-#             ], dtype=float)
-
-#             # Step 5: Calculate AHP scores
-#             scores = calculate_ahp(data, weights, company_names, criteria_names)
-
-#             # Step 6: Prepare results for response
-#             scores.sort(key=lambda x: x["score"], reverse=True)
-#             result = {
-#                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
-#                 "ahp_rankings": scores,
-#             }
-
-#             return Response(result, status=status.HTTP_200_OK)
-
-#         except Exception as e:
-#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
