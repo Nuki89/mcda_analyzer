@@ -32,3 +32,14 @@ body::-webkit-scrollbar {
   .mdc-notched-outline__trailing {
   border-width: 2px !important;
 }
+
+html {
+  --mdc-checkbox-selected-checkmark-color: rgb(255, 255, 255); 
+  --mdc-checkbox-selected-icon-color: rgb(0, 199, 0); 
+  --mdc-checkbox-selected-focus-icon-color: rgb(0, 199, 0); 
+  --mdc-checkbox-selected-hover-icon-color: green; 
+  --mdc-checkbox-selected-pressed-icon-color: green; 
+  --mdc-checkbox-selected-focus-state-layer-color: green; 
+  --mdc-checkbox-selected-hover-state-layer-color: green; 
+  --mdc-checkbox-selected-pressed-state-layer-color: green; 
+}

@@ -66,3 +66,16 @@
 ::ng-deep .mat-mdc-select-panel::-webkit-scrollbar {
     display: none;
 }
+
+/* NOT WORKING yet */
+::ng-deep .custom-checkbox .mat-checkbox-frame {
+  border-color: green !important;
+}
+
+::ng-deep .custom-checkbox.mat-checkbox-checked .mat-checkbox-background {
+  background-color: green !important;
+}
+
+::ng-deep .custom-checkbox .mat-checkbox-checkmark-path {
+  stroke: white !important;
+}
