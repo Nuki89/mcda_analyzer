@@ -3,19 +3,21 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.urls import reverse
+from rest_framework import viewsets
 from rest_framework import status
+from django.urls import reverse
+from django.utils import timezone
 from .models import *
+from django.utils.timezone import now
 from .serializers import *
 # from .services.scraper import scrape_fortune_rows # Old scraper
 from .scrapers.scraper_optimized import scrape_fortune_rows_hybrid
 from .services import *
 # from .mcda import * # Old mcda 
-from django.utils import timezone
-from rest_framework import viewsets
 import numpy as np
 import logging
 import requests
+
 
 logger = logging.getLogger(__name__)
 
@@ -184,14 +186,6 @@ class AHPResultViewSet(viewsets.ModelViewSet):
     queryset = AHPResult.objects.all()
     serializer_class = AHPResultSerializer
 
-    @action(detail=False, methods=['post'])
-    def save_ahp(self, request):
-        data = request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class TOPSISView(APIView):
     def get(self, request):
@@ -226,15 +220,85 @@ class TOPSISView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class PrometheeView(viewsets.ModelViewSet):
-    # queryset = PrometheeResult.objects.all()
-    # serializer_class = PrometheeResultSerializer
+class PrometheeResultViewSet(viewsets.ModelViewSet):
+    queryset = PrometheeResult.objects.all()
+    serializer_class = PrometheeResultSerializer
 
     def get(self, request):
-        return Response({
-            "detail": "This endpoint calculates rankings using the PROMETHEE method. Please use POST with data to perform calculations."
-        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        entries = PrometheeResult.objects.all().order_by('rank')
+        serializer = PrometheeResultSerializer(entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request):
-        # Placeholder for PROMETHEE calculation logic
-        return Response({"message": "PROMETHEE calculation not implemented yet"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+class PrometheeView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            criteria_url = 'http://127.0.0.1:8000/criteria-db/'
+            selected_criteria_param = request.query_params.get('selected_criteria', None)
+            weights_param = request.query_params.get('weights', None)
+            
+            company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
+
+            result = perform_promethee_calculation(
+                criteria_url, selected_criteria_param, weights_param, company_queryset
+            )
+
+            self.save_promethee_result(result)
+
+            return Response(result, status=status.HTTP_200_OK)
+
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+
+            selected_criteria = data.get('selected_criteria', [])
+            weights = data.get('weights', [])
+            if not selected_criteria or not weights:
+                return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            if len(weights) != len(selected_criteria):
+                return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
+
+            weights = list(map(float, weights))
+            if not np.isclose(sum(weights), 1.0):
+                return Response({"error": "Weights must sum to 1."}, status=status.HTTP_400_BAD_REQUEST)
+
+            criteria_url = 'http://127.0.0.1:8000/criteria-db/'
+            company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
+
+            # Perform PROMETHEE calculation
+            result = perform_promethee_calculation(
+                criteria_url, ','.join(selected_criteria), weights, company_queryset
+            )
+
+            # Save the result
+            self.save_promethee_result(result)
+
+            return Response(result, status=status.HTTP_200_OK)
+
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def save_promethee_result(self, result):
+
+        PrometheeResult.objects.all().delete()
+
+        criteria_with_weights = result['criteria_with_weights']
+        rankings = result['promethee_rankings']
+
+        weights = [item['weight'] for item in criteria_with_weights]
+
+        PrometheeResult.objects.create(
+            criteria=criteria_with_weights,
+            weights=weights,
+            rankings=rankings,
+            timestamp=now() 
+        )

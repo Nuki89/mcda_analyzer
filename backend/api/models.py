@@ -31,6 +31,16 @@ class AHPResult(models.Model):
         return f"{self.name} - {self.score}"
     
 
+class PrometheeResult(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    criteria = models.JSONField(default=list, help_text="Selected criteria with weights")
+    weights = models.JSONField(default=list, help_text="Weights for each criterion")
+    rankings = models.JSONField(default=list, help_text="Rankings with net flows")
+
+    def __str__(self):
+        return f"PROMETHEE Result ({self.timestamp})"
+
+
 class Criteria(models.Model):
     name = models.CharField(max_length=255, unique=True)
     field = models.CharField(max_length=255, unique=True)

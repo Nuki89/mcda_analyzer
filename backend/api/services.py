@@ -142,3 +142,165 @@ def calculate_topsis(data, weights, company_names, criteria_names):
     sorted_coefficients = [closeness_coefficients[i] for i in sorted_indices]
 
     return sorted_names, sorted_coefficients
+
+# PROMETHEE-Specific Function
+def calculate_promethee(data, weights, company_names, criteria_directions, scale_net_flows=False):
+    """
+    Calculate PROMETHEE rankings for companies with optional scaling.
+
+    Args:
+        data (numpy.ndarray): Matrix of company data.
+        weights (numpy.ndarray): Criteria weights.
+        company_names (list): Names of companies.
+        criteria_directions (list): 1 for benefit, -1 for cost.
+        scale_net_flows (bool): Whether to scale net flows to a specific range.
+
+    Returns:
+        list: Sorted scores with company names.
+    """
+    num_companies, num_criteria = data.shape
+
+    # Normalize weights
+    weights = np.array(weights)
+    weights = weights / np.sum(weights)
+
+    # Normalize data
+    normalized_data = np.zeros_like(data, dtype=float)
+    for j in range(num_criteria):
+        range_criteria = data[:, j].max() - data[:, j].min()
+        if range_criteria != 0:
+            if criteria_directions[j] == 1:  # Benefit criterion
+                normalized_data[:, j] = (data[:, j] - data[:, j].min()) / range_criteria
+            elif criteria_directions[j] == -1:  # Cost criterion
+                normalized_data[:, j] = (data[:, j].max() - data[:, j]) / range_criteria
+        else:
+            normalized_data[:, j] = 0.5  # Assign mid-point for identical values
+
+    # Calculate pairwise preferences
+    preference_matrix = np.zeros((num_companies, num_companies))
+    for i in range(num_companies):
+        for j in range(num_companies):
+            if i != j:
+                preference_sum = 0
+                for k in range(num_criteria):
+                    preference_value = max(0, normalized_data[i, k] - normalized_data[j, k])
+                    preference_sum += weights[k] * preference_value
+                preference_matrix[i, j] = preference_sum
+
+    # Calculate positive and negative preference flows
+    positive_flows = preference_matrix.sum(axis=1)
+    negative_flows = preference_matrix.sum(axis=0)
+    net_flows = positive_flows - negative_flows
+
+    # Optionally scale net flows
+    if scale_net_flows:
+        min_flow, max_flow = min(net_flows), max(net_flows)
+        net_flows = [(flow - min_flow) / (max_flow - min_flow) for flow in net_flows]
+
+    # Rank companies
+    company_scores = [{"name": name, "net_flow": net_flow} for name, net_flow in zip(company_names, net_flows)]
+    company_scores.sort(key=lambda x: x["net_flow"], reverse=True)
+
+    return company_scores
+
+
+# PROMETHEE-Specific Function
+# def calculate_promethee(data, weights, company_names, criteria_directions, normalize_net_flows=False):
+#     """
+#     Calculate PROMETHEE rankings for companies with debugging.
+
+#     Args:
+#         data (numpy.ndarray): Matrix of company data.
+#         weights (numpy.ndarray): Criteria weights.
+#         company_names (list): Names of companies.
+#         criteria_directions (list): 1 for benefit, -1 for cost.
+#         normalize_net_flows (bool): Whether to normalize net flows to 0-1 range.
+
+#     Returns:
+#         list: Sorted scores with company names.
+#     """
+#     num_companies, num_criteria = data.shape
+
+#     # Validate inputs
+#     if len(weights) != num_criteria:
+#         raise ValueError("Weights length must match the number of criteria.")
+#     if len(criteria_directions) != num_criteria:
+#         raise ValueError("Criteria directions length must match the number of criteria.")
+#     if len(company_names) != num_companies:
+#         raise ValueError("Number of company names must match the number of companies.")
+
+#     # Normalize weights
+#     weights = np.array(weights)
+#     weights = weights / np.sum(weights)
+#     print("Normalized Weights:\n", weights)
+
+#     # Normalize data
+#     normalized_data = np.zeros_like(data, dtype=float)
+#     for j in range(num_criteria):
+#         range_criteria = data[:, j].max() - data[:, j].min()
+#         if range_criteria != 0:
+#             if criteria_directions[j] == 1:  # Benefit criterion
+#                 normalized_data[:, j] = (data[:, j] - data[:, j].min()) / range_criteria
+#             elif criteria_directions[j] == -1:  # Cost criterion
+#                 normalized_data[:, j] = (data[:, j].max() - data[:, j]) / range_criteria
+#         else:
+#             normalized_data[:, j] = 0.5  # Assign mid-point for identical values
+#     print("Normalized Data:\n", normalized_data)
+
+#     # Calculate pairwise preferences
+#     preference_matrix = np.zeros((num_companies, num_companies))
+#     for i in range(num_companies):
+#         for j in range(num_companies):
+#             if i != j:
+#                 preference_sum = 0
+#                 for k in range(num_criteria):
+#                     preference_value = max(0, normalized_data[i, k] - normalized_data[j, k])
+#                     preference_sum += weights[k] * preference_value
+#                 preference_matrix[i, j] = preference_sum
+#     print("Preference Matrix:\n", preference_matrix)
+
+#     # Calculate positive and negative preference flows
+#     positive_flows = preference_matrix.sum(axis=1)
+#     negative_flows = preference_matrix.sum(axis=0)
+#     net_flows = positive_flows - negative_flows
+
+#     # Optional: Normalize net flows
+#     if normalize_net_flows:
+#         net_flows = (net_flows - net_flows.min()) / (net_flows.max() - net_flows.min())
+
+#     # Rank companies
+#     company_scores = [{"name": name, "net_flow": net_flow} for name, net_flow in zip(company_names, net_flows)]
+#     company_scores.sort(key=lambda x: x["net_flow"], reverse=True)
+
+#     return company_scores
+
+
+##TEST
+def perform_promethee_calculation(criteria_url, selected_criteria, weights_param, company_queryset):
+    # Fetch and process criteria
+    criteria = fetch_criteria(criteria_url)
+    criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria)
+
+    # Fetch company data
+    if not company_queryset.exists():
+        raise ValidationError("No data found. Please scrape data first.")
+
+    company_names = [entry.name for entry in company_queryset]
+    data_matrix = np.array([
+        [getattr(entry, c['field'], 0) or 0 for c in criteria]
+        for entry in company_queryset
+    ], dtype=float)
+
+    # Process weights and directions
+    weights = process_weights(weights_param, default_weights, len(criteria_names))
+    criteria_directions = [1 if c.get('field').endswith('_benefit') else -1 for c in criteria]
+
+    # Perform PROMETHEE calculation
+    scores = calculate_promethee(data_matrix, weights, company_names, criteria_directions)
+
+    # Prepare the result
+    result = {
+        "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+        "promethee_rankings": scores,
+    }
+    return result

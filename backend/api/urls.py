@@ -15,7 +15,7 @@ class BaseRouter(routers.DefaultRouter):
 router = BaseRouter()
 router.register(r'scraped-data', views.CachedFortuneDataView, basename='scraped-data')
 router.register(r'ahp-results', AHPResultViewSet, basename='ahp-results')
-router.register(r'promethee', views.PrometheeView, basename='promethee-view')
+router.register(r'promethee-results', PrometheeResultViewSet, basename='promethee-results')
 router.register(r'criteria-db', views.CriteriaWeightsView, basename='criteria-db')
 router.register(r'criteria', views.CriteriaWeightsView, basename='criteria')
 
@@ -25,7 +25,5 @@ urlpatterns = [
     path('scrape/', ScrapeFortuneDataView.as_view(), name='trigger-scraping'),
     path('topsis/', TOPSISView.as_view(), name='topsis-method'),
     path('ahp/', AHPView.as_view(), name='ahp-view'),
-    # path('', ApiRootView.as_view(), name='api-root'),  
-    # path('scraped-data/', CachedFortuneDataView.as_view(), name='cached-data'),
-    # path('promethee/', PrometheeView.as_view(), name='promethee-method'),
+    path('promethee/', PrometheeView.as_view(), name='promethee-method'),
 ]
