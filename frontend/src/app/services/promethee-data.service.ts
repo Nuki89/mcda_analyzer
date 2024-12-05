@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class PrometheeDataService {
 
-  private apiUrl = 'http://127.0.0.1:8000/ahp/';
+  private apiUrl = 'http://127.0.0.1:8000/promethee-results/';
 
   constructor(private http: HttpClient) { }
 
