@@ -220,6 +220,12 @@ class TOPSISView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# NOT WORKING...yet
+# class TopsisResultViewSet(viewsets.ModelViewSet):
+#     queryset = TospsisResult.objects.all()
+#     serializer_class = TospsisResulttSerializer
+
+
 class PrometheeResultViewSet(viewsets.ModelViewSet):
     queryset = PrometheeResult.objects.all()
     serializer_class = PrometheeResultSerializer
