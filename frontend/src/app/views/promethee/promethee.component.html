@@ -1,1 +1,50 @@
-<p>promethee works!</p>
+<div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-6 tw-p-4" *ngIf="prometheeData">
+    <div class="lg:tw-basis-full tw-flex-auto">
+
+        <div class="tw-bg-white/10 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+            <h1 
+              [ngClass]="themeClass"
+              class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">
+              {{ title }} -> Top {{ selectedTopCount }} Companies
+              
+              <div class="tw-flex tw-items-center tw-mt-2 tw-gap-2">
+                <span class="tw-text-sm">Show scores</span>
+                  <mat-checkbox [(ngModel)]="showScores" class="tw-bg-transparent tw-border-white/20"></mat-checkbox>
+              </div>
+    
+              <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
+                <div class="tw-text-sm">Show top</div>
+                <mat-form-field appearance="outline" class="tw-w-20 custom-border-height">              
+                  <mat-select [(value)]="selectedTopCount" (valueChange)="onTopCountChange($event)" class="tw-text-sm">
+                    <mat-option *ngFor="let option of topOptions" [value]="option">
+                      {{ option }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>  
+              </div>
+    
+            </h1>
+            <div class="tw-overflow-auto">
+                <div class="tw-m-4">
+                  
+                    <ol class="tw-list-decimal tw-mt-2 tw-space-x-8 tw-flex tw-flex-wrap">
+                        <li *ngFor="let company of topThreeCompanies" class="tw-inline-block tw-border tw-p-2 tw-rounded-lg">
+                            <strong>{{ company.name }}</strong>
+                            <span *ngIf="showScores" class="tw-transition-opacity tw-duration-300 tw-opacity-100">
+                              : {{ company.net_flow | number:'1.2-4' }}
+                            </span>
+                        </li>
+                    </ol>
+    
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+<div *ngIf="!prometheeData" class="tw-text-center tw-mt-10">
+    <p>Loading Promethee data...</p>
+</div>
