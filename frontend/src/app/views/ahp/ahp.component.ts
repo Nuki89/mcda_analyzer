@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { AhpDataService } from '../../services/ahp-data.service';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -36,6 +36,7 @@ export class AhpComponent  {
     @Inject(HttpClient) private http: HttpClient,
     private ahpDataService: AhpDataService,
     public darkService: DarkModeService, 
+    private cdr: ChangeDetectorRef,
     ) {}
 
     get themeClass() {
@@ -78,13 +79,19 @@ export class AhpComponent  {
                     coefficient: Number(ranking.score),
                 }))
                 .sort((a: { name: string; coefficient: number }, b: { name: string; coefficient: number }) => b.coefficient - a.coefficient)
-                .slice(0, 3);
+                .slice(0, this.selectedTopCount);
     
         } else {
             console.error("AHP Rankings are missing or empty.");
             this.topThreeCompanies = [];
         }
     }
+
+    onTopCountChange(newCount: number): void {
+        this.selectedTopCount = newCount; 
+        this.calculateTopThreeCompanies(); 
+        this.cdr.detectChanges(); 
+      }
 
     saveWeights() {
         const activeCriteria = this.criteriaWithWeights.filter(c => c.active);

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, Inject } from '@angular/core';
 import { TopsisDataService } from '../../services/topsis-data.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -36,6 +36,7 @@ export class TopsisComponent {
     @Inject(HttpClient) private http: HttpClient,
     private topsisDataService: TopsisDataService,
     public darkService: DarkModeService, 
+    private cdr: ChangeDetectorRef,
   ) {}
 
   get themeClass() {
@@ -66,10 +67,16 @@ export class TopsisComponent {
       this.topThreeCompanies = coefficients
         .map(([name, coefficient]: [string, unknown]) => ({ name, coefficient: Number(coefficient) }))
         .sort((a, b) => b.coefficient - a.coefficient)
-        .slice(0, 3);
+        .slice(0, this.selectedTopCount);
     }
   }
 
+  onTopCountChange(newCount: number): void {
+    this.selectedTopCount = newCount; 
+    this.calculateTopThreeCompanies(); 
+    this.cdr.detectChanges(); 
+  }
+  
   private calculateWeightSum() {
     const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
     this.weightSum = activeCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);
