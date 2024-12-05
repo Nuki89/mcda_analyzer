@@ -23,7 +23,7 @@
             <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
               <div class="tw-text-sm">Show top</div>
               <mat-form-field appearance="outline" class="tw-w-20 custom-border-height">              
-                <mat-select [(value)]="selectedTopCount" class="tw-text-sm">
+                <mat-select [(value)]="selectedTopCount" (valueChange)="onTopCountChange($event)" class="tw-text-sm">
                   <mat-option *ngFor="let option of topOptions" [value]="option">
                     {{ option }}
                   </mat-option>
