@@ -1,3 +1,7 @@
 <button (click)="toggleTheme()" class="tw-inline-flex tw-items-center focus:tw-outline-none">
-    <fa-icon [icon]="darkService.isDarkMode ? faSun : faMoon" class="tw-mr-2"></fa-icon>
+    <fa-icon 
+        [icon]="darkService.isDarkMode ? faSun : faMoon" 
+        [ngClass]="{ 'tw-text-fuchsia-600': darkService.isDarkMode }"
+        class="tw-mr-2">
+    </fa-icon>
 </button>

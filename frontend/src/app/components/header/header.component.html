@@ -1,11 +1,8 @@
-<!-- <footer class="tw-bg-gray-100/10 tw-rounded-lg tw-shadow-lg tw-m-4 dark:tw-bg-black-300">
-  <div class="tw-w-full tw-mx-auto tw-max-w-screen-l tw-p-4 md:tw-flex md:tw-items-center md:tw-justify-between"> -->
 <nav class="tw-bg-gray-100/10 tw-rounded-lg tw-shadow-lg tw-ml-4 tw-mr-4">
   <div class="tw-w-full tw-mx-auto tw-max-w-screen-l tw-p-4 md:tw-flex md:tw-items-center md:tw-justify-between">
     <a 
       class="tw-flex tw-items-center tw-text-black tw-font-semibold tw-text-lg" 
       routerLink="/dashboard">
-      <!-- <img src="../../../assets/images/mcda.jpg" alt="Logo" width="30" height="24" class="tw-mr-2">  -->
       <h1>MCDA</h1>
     </a>
 
@@ -13,32 +10,32 @@
       <li>
         <a 
           routerLink="/dashboard" 
-          routerLinkActive="tw-text-purple-300" 
-          class="hover:tw-text-purple-300">Dashboard</a>
+          routerLinkActive="tw-text-purple-700" 
+          class="hover:tw-text-purple-700">Dashboard</a>
       </li>
       <li>
         <a 
           routerLink="/ahp" 
-          routerLinkActive="tw-text-purple-300" 
-          class="hover:tw-text-purple-300">AHP</a>
+          routerLinkActive="tw-text-purple-700" 
+          class="hover:tw-text-purple-700">AHP</a>
       </li>
       <li>
         <a 
           routerLink="/topsis" 
-          routerLinkActive="tw-text-purple-300" 
-          class="hover:tw-text-purple-300">Topsis</a>
+          routerLinkActive="tw-text-purple-700" 
+          class="hover:tw-text-purple-700">Topsis</a>
       </li>
       <li>
         <a 
           routerLink="/promethee" 
-          routerLinkActive="tw-text-purple-300" 
-          class="hover:tw-text-purple-300">Promethee</a>
+          routerLinkActive="tw-text-purple-700" 
+          class="hover:tw-text-purple-700">Promethee</a>
       </li>
       <li>
         <a 
           routerLink="/wsm" 
-          routerLinkActive="tw-text-purple-300" 
-          class="hover:tw-text-purple-300">WSM</a>
+          routerLinkActive="tw-text-purple-700" 
+          class="hover:tw-text-purple-700">WSM</a>
       </li>
     </ul>
 
@@ -46,6 +43,15 @@
       
       <app-dark-mode></app-dark-mode>
       <button 
+        class="tw-inline-flex tw-items-center tw-text-black tw-md:hidden focus:tw-outline-none" 
+        type="button">
+        <fa-icon 
+        [icon]="faSnowflake"
+        
+        class="tw-mr-2">
+        </fa-icon>  
+      </button>
+      <!-- <button 
         class="tw-inline-flex tw-items-center tw-text-black tw-md:hidden focus:tw-outline-none" 
         type="button" 
         (click)="toggleMenu()"
@@ -55,16 +61,16 @@
         <svg class="tw-w-6 tw-h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
-      </button>
+      </button> -->
     </div>
 
     <div [class.tw-hidden]="!isMenuOpen" class="tw-absolute tw-top-16 tw-right-4 tw-bg-slate-400 tw-p-4 tw-rounded-md tw-shadow-md tw-z-50 tw-w-48 tw-md:tw-w-auto tw-md:tw-relative tw-md:tw-top-0 tw-md:bg-transparent tw-md:tw-p-0 tw-md:tw-shadow-none" id="navbar-menu">
       <ul class="tw-flex tw-flex-col tw-items-start tw-space-y-4 tw-md:flex-row tw-md:space-y-0 tw-md:space-x-6 tw-text-black tw-font-medium">
         <li>
-          <a class="tw-text-black hover:tw-text-purple-300" href="#">Home</a>
+          <a class="tw-text-black hover:tw-text-purple-700" href="#">Home</a>
         </li>
         <li>
-          <a class="tw-text-black hover:tw-text-purple-300" href="#">Link</a>
+          <a class="tw-text-black hover:tw-text-purple-700" href="#">Link</a>
         </li>
       </ul>
     </div>

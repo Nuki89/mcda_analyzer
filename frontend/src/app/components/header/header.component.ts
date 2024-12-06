@@ -1,9 +1,8 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSun } from '@fortawesome/free-solid-svg-icons';
-import { faMoon } from '@fortawesome/free-solid-svg-icons';
 import { DarkModeComponent } from '../dark-mode/dark-mode.component';
 import { RouterModule } from '@angular/router';
+import { faSnowflake } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-header',
@@ -14,9 +13,8 @@ import { RouterModule } from '@angular/router';
   encapsulation: ViewEncapsulation.None
 })
 export class HeaderComponent {
-  // ICONS
-  faSun = faSun;
-  faMoon = faMoon;
+  // FONTAWESOME ICONS
+  faSnowflake = faSnowflake;
   
   isMenuOpen = false;
 
