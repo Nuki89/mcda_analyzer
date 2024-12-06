@@ -32,6 +32,7 @@ class ApiRootView(APIView):
 class CriteriaWeightsView(ViewSet):
     def list(self, request):
         criteria = list(Criteria.objects.all().values('name', 'field', 'default_weight'))
+        logger.info(f"Fetched criteria: {criteria}")
 
         if not criteria:
             criteria = get_criteria_with_fallback()
@@ -45,6 +46,22 @@ class CriteriaDBView(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         criteria = get_criteria_with_fallback()
         return Response(criteria, status=status.HTTP_200_OK)
+
+
+# class CriteriaWeightsView(ViewSet):
+#     def list(self, request):
+#         criteria = list(Criteria.objects.all().values('name', 'field', 'default_weight'))
+#         logger.info(f"Fetched criteria from database: {criteria}")
+
+#         return Response(criteria, status=status.HTTP_200_OK)
+
+
+# class CriteriaDBView(viewsets.ViewSet):
+#     def list(self, request, *args, **kwargs):
+#         criteria = get_criteria_with_fallback()
+#         logger.info(f"Fetched hardcoded default criteria: {criteria}")
+
+#         return Response(criteria, status=status.HTTP_200_OK)
 
 
 class ScrapeFortuneDataView(APIView):
@@ -313,6 +330,76 @@ class PrometheeView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# SAVING WEIGHTS AND CRITERIA NOT WORKING PROP.
+    # def post(self, request, *args, **kwargs):
+    #     try:
+    #         data = request.data
+
+    #         selected_criteria = data.get('selected_criteria', [])
+    #         weights = data.get('weights', [])
+
+    #         if not isinstance(selected_criteria, list) or not isinstance(weights, list):
+    #             return Response({"error": "selected_criteria and weights must be arrays."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         if not selected_criteria or not weights:
+    #             return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         if len(weights) != len(selected_criteria):
+    #             return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         weights = list(map(float, weights))  
+    #         if not np.isclose(sum(weights), 1.0):
+    #             return Response({"error": "Weights must sum to 1."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         # Update criteria weights in the database
+    #         for criterion_name, weight in zip(selected_criteria, weights):
+    #             try:
+    #                 criteria_obj = Criteria.objects.filter(name=criterion_name).first()
+    #                 if criteria_obj:
+    #                     logger.info(f"Before update: {criteria_obj.name} - {criteria_obj.default_weight}")
+    #                     criteria_obj.default_weight = weight
+    #                     criteria_obj.save()
+    #                     logger.info(f"After update: {criteria_obj.name} - {criteria_obj.default_weight}")
+    #                 else:
+    #                     logger.warning(f"Criterion '{criterion_name}' not found in the database.")
+    #             except Exception as e:
+    #                 logger.error(f"Error updating criterion '{criterion_name}': {e}")
+
+
+    #         criteria_url = 'http://127.0.0.1:8000/criteria/'
+    #         criteria = fetch_criteria(criteria_url)
+    #         criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
+
+    #         company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
+    #         if not company_queryset.exists():
+    #             return Response({"error": "No company data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+
+    #         data_matrix = np.array([
+    #             [
+    #                 convert_to_float(getattr(entry, c['field'], 0)) or 0 
+    #                 for c in criteria
+    #             ]
+    #             for entry in company_queryset
+    #         ], dtype=float)
+            
+    #         criteria_directions = [1 if c['field'].endswith('_benefit') else -1 for c in criteria]
+
+    #         result = calculate_promethee(data_matrix, weights, [entry.name for entry in company_queryset], criteria_directions)
+
+    #         response_data = {
+    #             "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+    #             "promethee_rankings": result,
+    #         }
+
+    #         self.save_promethee_result(response_data)
+
+    #         return Response(response_data, status=status.HTTP_200_OK)
+
+    #     except ValidationError as e:
+    #         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    #     except Exception as e:
+    #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     def save_promethee_result(self, result):
         PrometheeResult.objects.all().delete()
@@ -328,3 +415,23 @@ class PrometheeView(APIView):
             rankings=rankings,
             timestamp=now() 
         )
+
+        # Save weights into Criteria table
+        # for criterion in criteria_with_weights:
+        #     try:
+        #         criteria_obj = Criteria.objects.filter(name__iexact=criterion['name']).first()
+        #         if criteria_obj:
+        #             logger.info(f"Updating criterion '{criteria_obj.name}' with new weight: {criterion['weight']}")
+        #             criteria_obj.default_weight = criterion['weight']
+        #             criteria_obj.save()
+        #         else:
+        #             logger.warning(f"Criterion '{criterion['name']}' not found in the database. Creating it.")
+                
+        #             Criteria.objects.create(
+        #                 name=criterion['name'],
+        #                 field=criterion['name'].lower(),
+        #                 default_weight=criterion['weight']
+        #             )
+        #     except Exception as e:
+        #         logger.error(f"Error updating or creating criterion '{criterion['name']}': {e}")
+
