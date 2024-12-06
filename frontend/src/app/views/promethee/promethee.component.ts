@@ -10,6 +10,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
+interface Criterion {
+  name: string;
+  weight?: number; 
+  default_weight: number;
+}
+
 @Component({
   selector: 'app-promethee',
   standalone: true,
@@ -62,7 +68,31 @@ export class PrometheeComponent {
             console.error('Error fetching Promethee data:', error);
         }
     );
+  }
+
+
+  resetToDefaultWeights() {
+    this.http.get<Criterion[]>('http://127.0.0.1:8000/criteria-db/')
+        .subscribe(
+            (defaultWeights) => {
+                if (!Array.isArray(defaultWeights)) {
+                    console.error('Invalid response format for default weights.');
+                    return;
+                }
+                this.criteriaWithWeights = defaultWeights.map(criterion => ({
+                    name: criterion.name,
+                    weight: criterion.default_weight, // Map default_weight to weight
+                    active: true // Retain active state
+                }));
+                this.calculateWeightSum();
+            },
+            (error) => {
+                console.error('Error fetching default weights:', error);
+            }
+        );
 }
+
+
 
 
   private extractCriteriaWithWeights(data: any): { name: string; weight: number; active: boolean }[] {
