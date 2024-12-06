@@ -38,6 +38,8 @@ export class PrometheeComponent {
   criteriaWithWeights: { name: string; weight: number; active: boolean }[] = [];
   weightSum: number = 0;
   weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
+  isCalculating = false;
+  message: string | null = null;
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
@@ -58,8 +60,8 @@ export class PrometheeComponent {
   private loadData() {
     this.prometheeDataService.getPrometheeData().subscribe(
         (data: any) => {
-            console.log('Promethee data loaded:', data);
             this.prometheeData = data;
+            console.log('Promethee data loaded:', data);
 
             this.criteriaWithWeights = this.extractCriteriaWithWeights(this.prometheeData);
 
@@ -70,6 +72,25 @@ export class PrometheeComponent {
             console.error('Error fetching Promethee data:', error);
         }
     );
+  }
+
+  
+  onCalculate(): void {
+    this.isCalculating = true;
+    this.message = null;
+
+    this.prometheeDataService.triggerPrometheeCalculation().subscribe({
+      next: () => {
+        this.message = 'Promethee calculation completed successfully!';
+        this.isCalculating = false;
+        window.location.reload();
+      },
+      error: (err) => {
+        console.error('Promethee calculation failed:', err);
+        this.message = 'Failed to calculate Promethee. Please try again.';
+        this.isCalculating = false;
+      },
+    });
   }
 
 
@@ -83,8 +104,8 @@ export class PrometheeComponent {
                 }
                 this.criteriaWithWeights = defaultWeights.map(criterion => ({
                     name: criterion.name,
-                    weight: criterion.default_weight, // Map default_weight to weight
-                    active: true // Retain active state
+                    weight: criterion.default_weight, 
+                    active: true 
                 }));
                 this.calculateWeightSum();
             },
@@ -93,8 +114,6 @@ export class PrometheeComponent {
             }
         );
 }
-
-
 
 
   private extractCriteriaWithWeights(data: any): { name: string; weight: number; active: boolean }[] {
@@ -120,11 +139,10 @@ export class PrometheeComponent {
   private calculateTopThreeCompanies() {
     let rankings;
 
-    // Handle different data structures
     if (Array.isArray(this.prometheeData)) {
-        rankings = this.prometheeData[0]?.rankings; // Initial load structure
+        rankings = this.prometheeData[0]?.rankings; 
     } else {
-        rankings = this.prometheeData.promethee_rankings; // Backend response structure
+        rankings = this.prometheeData.promethee_rankings;
     }
 
     if (Array.isArray(rankings) && rankings.length > 0) {

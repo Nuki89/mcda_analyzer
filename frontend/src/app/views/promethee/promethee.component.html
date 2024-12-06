@@ -41,7 +41,14 @@
         </div>
 
         <div class="tw-mt-4 tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
-            <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights</h2>
+            <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights
+              <button 
+              class="tw-ml-2 tw-text-black tw-px-6 tw-py-2 tw-rounded tw-bg-gray-400 hover:tw-bg-gray-500" 
+              (click)="onCalculate()" 
+              [disabled]="isCalculating">
+                {{ isCalculating ? 'Calculating...' : 'Fetch' }}
+              </button>
+            </h2>
             
             <table class="tw-w-full tw-text-left tw-mt-4 tw-border-white/30">
               <thead>
@@ -93,7 +100,8 @@
               </tbody>
             </table>
         
-            <div class="tw-flex tw-justify-end tw-mt-4 tw-items-center" *ngIf="criteriaWithWeights?.length && criteriaWithWeights.length > 0">
+            <div class="tw-flex tw-justify-end tw-mt-4 tw-items-center">
+            <!-- <div class="tw-flex tw-justify-end tw-mt-4 tw-items-center" *ngIf="criteriaWithWeights?.length && criteriaWithWeights.length > 0"> -->
               <div class="tw-text-right tw-cursor-default">
                 <p class="tw-mr-4 tw-font-bold " [ngStyle]="{'color': weightSum === 1 ? 'green' : 'red'}">
                   Sum of Weights: {{ weightSum | number:'1.2-2' }}
@@ -132,7 +140,7 @@
 
             </div>
     
-        </div>
+        
 
     </div>
 
