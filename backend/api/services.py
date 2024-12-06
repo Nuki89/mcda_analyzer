@@ -3,6 +3,7 @@ from .models import *
 import numpy as np
 from django.core.exceptions import ValidationError
 import requests
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -40,23 +41,40 @@ def convert_to_int(value):
 
 def convert_to_float(value):
     """
-    Converts a value to float. Removes commas and dollar signs. Returns None if the value is None, empty, or '-'. 
+    Converts a value to float. Removes commas and dollar signs if the value is a string.
+    Handles Decimal objects directly. Returns None for invalid or non-convertible values.
     """
-    if value in (None, '-', ''):  # Checks for '-', empty, or None values
+    if value in (None, '-', ''):  # Handle None, '-', and empty strings
         return None
     try:
+        if isinstance(value, Decimal): 
+            return float(value)
+        if isinstance(value, (int, float)):
+            return float(value)
         return float(value.replace(",", "").replace("$", ""))
     except (ValueError, TypeError):
         return None
-    
 
-############################################################################################################
+
+# def convert_to_float(value):
+#     """
+#     Converts a value to float. Removes commas and dollar signs. Returns None if the value is None, empty, or '-'. 
+#     """
+#     if value in (None, '-', ''):  # Checks for '-', empty, or None values
+#         return None
+#     try:
+#         return float(value.replace(",", "").replace("$", ""))
+#     except (ValueError, TypeError):
+#         return None
+
+
 def fetch_criteria(api_url):
     """Fetch criteria from an external API."""
     response = requests.get(api_url)
     if response.status_code != 200:
         raise ValidationError("Failed to fetch criteria from external API.")
     return response.json()
+
 
 def process_criteria(criteria, selected_criteria_param):
     """Filter and process criteria based on selected criteria."""
@@ -68,6 +86,7 @@ def process_criteria(criteria, selected_criteria_param):
     else:
         selected_criteria = [c['name'] for c in criteria]  
     return criteria, [c['name'] for c in criteria], np.array([c['default_weight'] for c in criteria])
+
 
 def process_weights(weights_param, default_weights, num_criteria):
     """Validate and normalize weights."""
@@ -82,6 +101,7 @@ def process_weights(weights_param, default_weights, num_criteria):
     else:
         weights = default_weights  
     return weights
+
 
 # AHP-Specific Function
 def calculate_ahp(data, weights, company_names, criteria_names):
@@ -106,6 +126,7 @@ def calculate_ahp(data, weights, company_names, criteria_names):
     company_scores = [{"name": name, "score": score} for name, score in zip(company_names, scores)]
     company_scores.sort(key=lambda x: x["score"], reverse=True)
     return company_scores
+
 
 # TOPSIS-Specific Function
 def calculate_topsis(data, weights, company_names, criteria_names):
@@ -142,6 +163,7 @@ def calculate_topsis(data, weights, company_names, criteria_names):
     sorted_coefficients = [closeness_coefficients[i] for i in sorted_indices]
 
     return sorted_names, sorted_coefficients
+
 
 # PROMETHEE-Specific Function
 def calculate_promethee(data, weights, company_names, criteria_directions, scale_net_flows=False):
@@ -204,78 +226,6 @@ def calculate_promethee(data, weights, company_names, criteria_directions, scale
     return company_scores
 
 
-# PROMETHEE-Specific Function
-# def calculate_promethee(data, weights, company_names, criteria_directions, normalize_net_flows=False):
-#     """
-#     Calculate PROMETHEE rankings for companies with debugging.
-
-#     Args:
-#         data (numpy.ndarray): Matrix of company data.
-#         weights (numpy.ndarray): Criteria weights.
-#         company_names (list): Names of companies.
-#         criteria_directions (list): 1 for benefit, -1 for cost.
-#         normalize_net_flows (bool): Whether to normalize net flows to 0-1 range.
-
-#     Returns:
-#         list: Sorted scores with company names.
-#     """
-#     num_companies, num_criteria = data.shape
-
-#     # Validate inputs
-#     if len(weights) != num_criteria:
-#         raise ValueError("Weights length must match the number of criteria.")
-#     if len(criteria_directions) != num_criteria:
-#         raise ValueError("Criteria directions length must match the number of criteria.")
-#     if len(company_names) != num_companies:
-#         raise ValueError("Number of company names must match the number of companies.")
-
-#     # Normalize weights
-#     weights = np.array(weights)
-#     weights = weights / np.sum(weights)
-#     print("Normalized Weights:\n", weights)
-
-#     # Normalize data
-#     normalized_data = np.zeros_like(data, dtype=float)
-#     for j in range(num_criteria):
-#         range_criteria = data[:, j].max() - data[:, j].min()
-#         if range_criteria != 0:
-#             if criteria_directions[j] == 1:  # Benefit criterion
-#                 normalized_data[:, j] = (data[:, j] - data[:, j].min()) / range_criteria
-#             elif criteria_directions[j] == -1:  # Cost criterion
-#                 normalized_data[:, j] = (data[:, j].max() - data[:, j]) / range_criteria
-#         else:
-#             normalized_data[:, j] = 0.5  # Assign mid-point for identical values
-#     print("Normalized Data:\n", normalized_data)
-
-#     # Calculate pairwise preferences
-#     preference_matrix = np.zeros((num_companies, num_companies))
-#     for i in range(num_companies):
-#         for j in range(num_companies):
-#             if i != j:
-#                 preference_sum = 0
-#                 for k in range(num_criteria):
-#                     preference_value = max(0, normalized_data[i, k] - normalized_data[j, k])
-#                     preference_sum += weights[k] * preference_value
-#                 preference_matrix[i, j] = preference_sum
-#     print("Preference Matrix:\n", preference_matrix)
-
-#     # Calculate positive and negative preference flows
-#     positive_flows = preference_matrix.sum(axis=1)
-#     negative_flows = preference_matrix.sum(axis=0)
-#     net_flows = positive_flows - negative_flows
-
-#     # Optional: Normalize net flows
-#     if normalize_net_flows:
-#         net_flows = (net_flows - net_flows.min()) / (net_flows.max() - net_flows.min())
-
-#     # Rank companies
-#     company_scores = [{"name": name, "net_flow": net_flow} for name, net_flow in zip(company_names, net_flows)]
-#     company_scores.sort(key=lambda x: x["net_flow"], reverse=True)
-
-#     return company_scores
-
-
-##TEST
 def perform_promethee_calculation(criteria_url, selected_criteria, weights_param, company_queryset):
     # Fetch and process criteria
     criteria = fetch_criteria(criteria_url)

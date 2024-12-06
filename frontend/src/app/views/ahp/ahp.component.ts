@@ -116,6 +116,8 @@ export class AhpComponent  {
           selected_criteria: selectedCriteria,
           weights: weights
         };
+        console.log('Payload:', payload);
+
       
         this.http
             .post('http://127.0.0.1:8000/ahp/', payload)

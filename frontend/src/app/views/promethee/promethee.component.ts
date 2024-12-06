@@ -10,6 +10,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
+interface Criterion {
+  name: string;
+  weight?: number; 
+  default_weight: number;
+}
+
 @Component({
   selector: 'app-promethee',
   standalone: true,
@@ -26,7 +32,10 @@ export class PrometheeComponent {
   selectedTopCount: number = 3; 
   showScores: boolean = false;
   topOptions: number[] = [3, 5, 10];
-  topThreeCompanies: { name: string; net_flow: number }[] = []; 
+  topThreeCompanies: { name: string; net_flow: number }[] = [];
+  criteriaWithWeights: { name: string; weight: number; active: boolean }[] = [];
+  weightSum: number = 0;
+  weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
@@ -43,34 +52,91 @@ export class PrometheeComponent {
     this.loadData();
   }
 
+
   private loadData() {
-      this.prometheeDataService.getPrometheeData().subscribe(
-          (data: any) => {
-          this.prometheeData = data;
-          console.log('Promethee data:', this.prometheeData);
-          this.calculateTopThreeCompanies();
-          console.log('Top Three Companies:', this.topThreeCompanies);
-          // this.criteriaWithWeights = this.extractCriteriaWithWeights(this.prometheeData);
-          // this.calculateWeightSum();
-          },
-          (error: any) => {
-          console.error('Error fetching Promethee data:', error);
-          }
-      );
+    this.prometheeDataService.getPrometheeData().subscribe(
+        (data: any) => {
+            console.log('Promethee data loaded:', data);
+            this.prometheeData = data;
+
+            this.criteriaWithWeights = this.extractCriteriaWithWeights(this.prometheeData);
+
+            this.calculateWeightSum();
+            this.calculateTopThreeCompanies();
+        },
+        (error: any) => {
+            console.error('Error fetching Promethee data:', error);
+        }
+    );
+  }
+
+
+  resetToDefaultWeights() {
+    this.http.get<Criterion[]>('http://127.0.0.1:8000/criteria-db/')
+        .subscribe(
+            (defaultWeights) => {
+                if (!Array.isArray(defaultWeights)) {
+                    console.error('Invalid response format for default weights.');
+                    return;
+                }
+                this.criteriaWithWeights = defaultWeights.map(criterion => ({
+                    name: criterion.name,
+                    weight: criterion.default_weight, // Map default_weight to weight
+                    active: true // Retain active state
+                }));
+                this.calculateWeightSum();
+            },
+            (error) => {
+                console.error('Error fetching default weights:', error);
+            }
+        );
+}
+
+
+
+
+  private extractCriteriaWithWeights(data: any): { name: string; weight: number; active: boolean }[] {
+    let criteria = [];
+
+    if (Array.isArray(data)) {
+        criteria = data[0]?.criteria || [];
+    } else if (data.criteria_with_weights) {
+        criteria = data.criteria_with_weights;
+    } else {
+        console.warn('Criteria is missing in the data.');
+        return [];
+    }
+
+    return criteria.map((criterion: any) => ({
+        name: criterion.name,
+        weight: criterion.weight,
+        active: true,
+    }));
   }
 
 
   private calculateTopThreeCompanies() {
-    if (Array.isArray(this.prometheeData[0]?.rankings) && this.prometheeData[0]?.rankings.length > 0) {
-        this.topThreeCompanies = this.prometheeData[0].rankings
+    let rankings;
+
+    // Handle different data structures
+    if (Array.isArray(this.prometheeData)) {
+        rankings = this.prometheeData[0]?.rankings; // Initial load structure
+    } else {
+        rankings = this.prometheeData.promethee_rankings; // Backend response structure
+    }
+
+    if (Array.isArray(rankings) && rankings.length > 0) {
+        this.topThreeCompanies = rankings
             .map((ranking: any) => ({
                 name: ranking.name,
-                net_flow: ranking.net_flow, 
+                net_flow: ranking.net_flow,
             }))
             .sort((a: { name: string; net_flow: number }, b: { name: string; net_flow: number }) => b.net_flow - a.net_flow)
-            .slice(0, this.selectedTopCount); 
+            .slice(0, this.selectedTopCount);
+
+        console.log('Top Three Companies:', this.topThreeCompanies);
     } else {
-        console.error("Promethee Rankings are missing or empty.");
+        console.warn("Promethee Rankings are missing or empty.");
         this.topThreeCompanies = [];
     }
   }
@@ -82,6 +148,71 @@ export class PrometheeComponent {
     this.cdr.detectChanges(); 
   }
 
+
+  saveWeights() {
+    
+    const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
   
+    if (activeCriteria.length === 0) {
+      alert('At least one criterion must be active.');
+      return;
+    }
+  
+    const selectedCriteria = activeCriteria.map(c => c.name);
+    // const selectedCriteria = activeCriteria.map(c => c.name).join(',');
+    const weights = activeCriteria.map(c => c.weight);
+  
+    const sumOfWeights = weights.reduce((a, b) => a + b, 0);
+    const roundedSum = Math.round(sumOfWeights * 1000) / 1000;
+  
+    if (roundedSum !== 1) {
+      alert(`Weights must sum to 1. Current sum: ${roundedSum}`);
+      return;
+    }
+  
+    const payload = {
+      selected_criteria: selectedCriteria,
+      weights: weights
+    };
+    console.log('Payload:', payload);
+
+  
+    this.http
+        .post('http://127.0.0.1:8000/promethee/', payload)
+        .subscribe(
+            (data: any) => {
+                console.log('Backend Response:', data);
+                this.prometheeData = data;
+                this.calculateTopThreeCompanies();
+
+                const savePayload = {
+                    criteria: data.criteria,
+                    rankings: data.rankings,
+                };
+            },
+            (error) => {
+            console.error('Error updating weights and criteria:', error);
+            }
+        );  
+  }
+
+
+  updateWeight(index: number, weight: number) {
+    this.criteriaWithWeights[index].weight = parseFloat(weight.toString()) || 0;
+    this.calculateWeightSum();
+  }
+
+
+  private calculateWeightSum() {
+    const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
+    this.weightSum = activeCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);
+    this.weightSum = Math.round(this.weightSum * 1000) / 1000;
+  }
+
+
+  onToggleChange() {
+    this.calculateWeightSum();
+  }
+
 
 }

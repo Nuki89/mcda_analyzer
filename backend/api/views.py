@@ -258,34 +258,55 @@ class PrometheeView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
     def post(self, request, *args, **kwargs):
         try:
             data = request.data
 
             selected_criteria = data.get('selected_criteria', [])
             weights = data.get('weights', [])
+
+            if not isinstance(selected_criteria, list) or not isinstance(weights, list):
+                return Response({"error": "selected_criteria and weights must be arrays."}, status=status.HTTP_400_BAD_REQUEST)
+
             if not selected_criteria or not weights:
                 return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
 
             if len(weights) != len(selected_criteria):
                 return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
 
-            weights = list(map(float, weights))
+            weights = list(map(float, weights))  
             if not np.isclose(sum(weights), 1.0):
                 return Response({"error": "Weights must sum to 1."}, status=status.HTTP_400_BAD_REQUEST)
 
             criteria_url = 'http://127.0.0.1:8000/criteria-db/'
+            criteria = fetch_criteria(criteria_url)
+            criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
+
             company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
+            if not company_queryset.exists():
+                return Response({"error": "No company data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
 
-            # Perform PROMETHEE calculation
-            result = perform_promethee_calculation(
-                criteria_url, ','.join(selected_criteria), weights, company_queryset
-            )
+            data_matrix = np.array([
+                [
+                    convert_to_float(getattr(entry, c['field'], 0)) or 0 
+                    for c in criteria
+                ]
+                for entry in company_queryset
+            ], dtype=float)
+            
+            criteria_directions = [1 if c['field'].endswith('_benefit') else -1 for c in criteria]
 
-            # Save the result
-            self.save_promethee_result(result)
+            result = calculate_promethee(data_matrix, weights, [entry.name for entry in company_queryset], criteria_directions)
 
-            return Response(result, status=status.HTTP_200_OK)
+            response_data = {
+                "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+                "promethee_rankings": result,
+            }
+
+            self.save_promethee_result(response_data)
+
+            return Response(response_data, status=status.HTTP_200_OK)
 
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -294,7 +315,6 @@ class PrometheeView(APIView):
 
 
     def save_promethee_result(self, result):
-
         PrometheeResult.objects.all().delete()
 
         criteria_with_weights = result['criteria_with_weights']
