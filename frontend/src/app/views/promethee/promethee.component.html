@@ -109,19 +109,26 @@
               <button
                 [disabled]="weightSum !== 1"
                 [ngClass]="{
-                  'tw-bg-violet-700 hover:tw-bg-violet-800': weightSum === 1,
+                  'tw-bg-violet-700 tw-text-white hover:tw-bg-violet-800': weightSum === 1,
                   'tw-bg-violet-300 cursor-not-allowed': weightSum !== 1
                 }"
                 class="tw-text-black tw-px-4 tw-py-2 tw-rounded"
                 (click)="saveWeights()">
-                Save Weights
+                Calculation   
+                <fa-icon 
+                  [icon]="faCalculator" 
+                  class="tw-text-white">
+                </fa-icon>
               </button>
               <button 
-              class="tw-ml-2 tw-text-black tw-px-4 tw-py-2 tw-rounded" 
-              [ngClass]="{
-                'tw-bg-red-500 hover:tw-bg-red-600': weightSum === 1,
-              }"
-              (click)="resetToDefaultWeights()">Reset</button>
+                class="tw-ml-2 tw-text-black tw-px-4 tw-py-2 tw-rounded tw-bg-red-500 hover:tw-bg-red-600" 
+                (click)="resetToDefaultWeights()">
+                Reset 
+                <fa-icon 
+                  [icon]="faRotateRight" 
+                  class="tw-text-black">
+                </fa-icon>
+              </button>
 
             </div>
     

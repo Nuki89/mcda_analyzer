@@ -8,7 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faCalculator, faRotateRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 interface Criterion {
   name: string;
@@ -25,6 +25,8 @@ interface Criterion {
 })
 export class PrometheeComponent {
   // Fontawesome icons
+  faCalculator = faCalculator
+  faRotateRight = faRotateRight;
   faTriangleExclamation = faTriangleExclamation;
 
   title = 'Promethee';
