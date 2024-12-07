@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { TopsisDataService } from '../../services/topsis-data.service';
 import { AhpDataService } from '../../services/ahp-data.service';
 import { CommonModule } from '@angular/common';
+import { PrometheeDataService } from '../../services/promethee-data.service';
 
 @Component({
   selector: 'app-main-dashboard',
@@ -14,16 +15,18 @@ import { CommonModule } from '@angular/common';
   styleUrl: './main-dashboard.component.css'
 })
 export class MainDashboardComponent {
-  topsisData: any = {};
   ahpData: any[] = []; 
+  prometheeData: any = {};
+  topsisData: any = {};
   bestCompany: any = null;
   criteriaWithWeights: { name: string, weight: number }[] = [];
   criteria: string[] = [];
 
   constructor(
+    private ahpDataService: AhpDataService,
+    private prometheeDataService: PrometheeDataService,
     private topsisDataService: TopsisDataService,
     @Inject(HttpClient) private http: HttpClient,
-    private ahpDataService: AhpDataService,
   ) {}
 
   async ngAfterViewInit() {
@@ -53,10 +56,19 @@ export class MainDashboardComponent {
         this.topsisData = data;
         console.log('Topsis data:', this.topsisData);
         this.criteriaWithWeights = this.extractCriteriaWithWeights(this.topsisData);
-        console.log('(topsis)Criteria with Weights:', this.criteriaWithWeights);
       },
       (error: any) => {
         console.error('Error fetching Topsis data:', error);
+      }
+    );
+
+    this.prometheeDataService.getPrometheeData().subscribe(
+      (data: any) => {
+        this.prometheeData = data;
+        console.log('Promethee data:', this.prometheeData);
+      },
+      (error: any) => {
+        console.error('Error fetching Promethee data:', error);
       }
     );
     
