@@ -1,10 +1,10 @@
 import { Component, Inject } from '@angular/core';
-import { ScrapingDataComponent } from '../../components/scraping-data/scraping-data.component';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { TopsisDataService } from '../../services/topsis-data.service';
-import { AhpDataService } from '../../services/ahp-data.service';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ScrapingDataComponent } from '../../components/scraping-data/scraping-data.component';
+import { AhpDataService } from '../../services/ahp-data.service';
+import { TopsisDataService } from '../../services/topsis-data.service';
 import { PrometheeDataService } from '../../services/promethee-data.service';
 
 @Component({
@@ -15,12 +15,9 @@ import { PrometheeDataService } from '../../services/promethee-data.service';
   styleUrl: './main-dashboard.component.css'
 })
 export class MainDashboardComponent {
-  ahpData: any[] = []; 
+  ahpData: any = {};
   prometheeData: any = {};
   topsisData: any = {};
-  bestCompany: any = null;
-  criteriaWithWeights: { name: string, weight: number }[] = [];
-  criteria: string[] = [];
 
   constructor(
     private ahpDataService: AhpDataService,
@@ -38,12 +35,6 @@ export class MainDashboardComponent {
     this.ahpDataService.getAHPdata().subscribe(
       (data) => {
           this.ahpData = data;
-
-          if (this.ahpData.length > 0) {
-              this.bestCompany = this.ahpData.reduce((prev, current) =>
-                  prev.score > current.score ? prev : current
-              );
-          }
           console.log('AHP data:', this.ahpData);
       },
       (error) => {
@@ -55,7 +46,6 @@ export class MainDashboardComponent {
       (data: any[]) => {
         this.topsisData = data;
         console.log('Topsis data:', this.topsisData);
-        this.criteriaWithWeights = this.extractCriteriaWithWeights(this.topsisData);
       },
       (error: any) => {
         console.error('Error fetching Topsis data:', error);
@@ -72,10 +62,6 @@ export class MainDashboardComponent {
       }
     );
     
-  }
-
-  private extractCriteriaWithWeights(data: any): { name: string, weight: number }[] {
-    return data.criteria_with_weights || [];
   }
 
 }
