@@ -42,12 +42,6 @@
 
         <div class="tw-mt-4 tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
             <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights
-              <button 
-              class="tw-ml-2 tw-text-black tw-px-6 tw-py-2 tw-rounded tw-bg-gray-400 hover:tw-bg-gray-500" 
-              (click)="onCalculate()" 
-              [disabled]="isCalculating">
-                {{ isCalculating ? 'Calculating...' : 'Fetch' }}
-              </button>
             </h2>
             
             <table class="tw-w-full tw-text-left tw-mt-4 tw-border-white/30">
@@ -127,6 +121,12 @@
                   [icon]="faCalculator" 
                   class="tw-text-white">
                 </fa-icon>
+              </button>
+              <button 
+              class="tw-ml-2 tw-text-black tw-px-6 tw-py-2 tw-rounded tw-bg-gray-400 hover:tw-bg-gray-500" 
+              (click)="onFetchNoData()" 
+              [disabled]="isCalculating">
+                {{ isCalculating ? 'Calculating...' : 'Fetch' }}
               </button>
               <button 
                 class="tw-ml-2 tw-text-black tw-px-4 tw-py-2 tw-rounded tw-bg-red-500 hover:tw-bg-red-600" 
