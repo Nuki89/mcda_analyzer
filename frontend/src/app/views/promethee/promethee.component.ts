@@ -75,7 +75,7 @@ export class PrometheeComponent {
   }
 
   
-  onCalculate(): void {
+  onFetchNoData(): void {
     this.isCalculating = true;
     this.message = null;
 
@@ -95,7 +95,7 @@ export class PrometheeComponent {
 
 
   resetToDefaultWeights() {
-    this.http.get<Criterion[]>('http://127.0.0.1:8000/criteria-db/')
+    this.http.get<Criterion[]>('http://127.0.0.1:8000/default-criteria/')
         .subscribe(
             (defaultWeights) => {
                 if (!Array.isArray(defaultWeights)) {
@@ -108,12 +108,13 @@ export class PrometheeComponent {
                     active: true 
                 }));
                 this.calculateWeightSum();
+                this.saveWeights();
             },
             (error) => {
                 console.error('Error fetching default weights:', error);
             }
         );
-}
+  }
 
 
   private extractCriteriaWithWeights(data: any): { name: string; weight: number; active: boolean }[] {

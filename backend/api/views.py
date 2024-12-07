@@ -133,7 +133,7 @@ class CachedFortuneDataView(viewsets.ModelViewSet):
 class AHPView(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            criteria = fetch_criteria('http://127.0.0.1:8000/criteria-db/')
+            criteria = fetch_criteria('http://127.0.0.1:8000/criteria/')
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
 
@@ -169,7 +169,7 @@ class AHPView(APIView):
             if not selected_criteria or not weights:
                 return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-            criteria = fetch_criteria('http://127.0.0.1:8000/criteria-db/')
+            criteria = fetch_criteria('http://127.0.0.1:8000/criteria/')
             criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
 
             entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
@@ -207,7 +207,7 @@ class AHPResultViewSet(viewsets.ModelViewSet):
 class TOPSISView(APIView):
     def get(self, request):
         try:
-            criteria = fetch_criteria('http://127.0.0.1:8000/criteria-db/')
+            criteria = fetch_criteria('http://127.0.0.1:8000/criteria/')
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
 
@@ -256,7 +256,7 @@ class PrometheeResultViewSet(viewsets.ModelViewSet):
 class PrometheeView(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            criteria_url = 'http://127.0.0.1:8000/criteria-db/'
+            criteria_url = 'http://127.0.0.1:8000/criteria/'
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             weights_param = request.query_params.get('weights', None)
             
@@ -296,7 +296,7 @@ class PrometheeView(APIView):
             if not np.isclose(sum(weights), 1.0):
                 return Response({"error": "Weights must sum to 1."}, status=status.HTTP_400_BAD_REQUEST)
 
-            criteria_url = 'http://127.0.0.1:8000/criteria-db/'
+            criteria_url = 'http://127.0.0.1:8000/criteria/'
             criteria = fetch_criteria(criteria_url)
             criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
 

@@ -1,7 +1,7 @@
 from django.urls import path, include
-from .views import *
 from rest_framework import routers
 from rest_framework.permissions import IsAuthenticated
+from .views import *
 from . import views
 
 class BaseRouterRootView(routers.APIRootView):
@@ -16,8 +16,8 @@ router = BaseRouter()
 router.register(r'scraped-data', views.CachedFortuneDataView, basename='scraped-data')
 router.register(r'ahp-results', AHPResultViewSet, basename='ahp-results')
 router.register(r'promethee-results', PrometheeResultViewSet, basename='promethee-results')
-router.register(r'criteria-db', views.CriteriaWeightsView, basename='criteria-db')
 router.register(r'criteria', views.CriteriaWeightsView, basename='criteria')
+router.register(r'default-criteria', views.CriteriaDBView, basename='criteria-db')
 
 
 urlpatterns = [
