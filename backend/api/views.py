@@ -44,7 +44,7 @@ class CriteriaDBView(viewsets.ModelViewSet):
     serializer_class = CriteriaSerializer
 
     def list(self, request, *args, **kwargs):
-        criteria = get_criteria_with_fallback()
+        criteria = get_criteria_with_fallback_test()
         return Response(criteria, status=status.HTTP_200_OK)
 
 
