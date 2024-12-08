@@ -66,7 +66,7 @@
               </td>
               <td 
                 class="tw-py-2 tw-px-4" 
-                [ngStyle]="!criterion.active ? {'text-decoration': 'line-through'} : {}">
+                >
                 {{ criterion.name }}
               </td> 
               <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
@@ -110,18 +110,29 @@
           <button
             [disabled]="weightSum !== 1"
             [ngClass]="{
-              'tw-bg-violet-800 hover:tw-bg-violet-900': weightSum === 1,
-              'tw-bg-violet-400 cursor-not-allowed': weightSum !== 1
+              'tw-bg-violet-800 tw-text-white hover:tw-bg-violet-900': weightSum === 1,
+              'tw-bg-violet-400 tw-text-black cursor-not-allowed': weightSum !== 1
             }"
             class="tw-text-white tw-px-4 tw-py-2 tw-rounded"
             (click)="saveWeights()">
             Save
+            <fa-icon 
+              [icon]="faFloppyDisk" 
+              [ngClass]="{
+                'tw-text-white ': weightSum === 1,
+                'tw-text-black cursor-not-allowed': weightSum !== 1
+              }">
+            </fa-icon>
           </button>
           
           <button 
             class="tw-ml-2 tw-text-white tw-px-4 tw-py-2 tw-rounded tw-bg-red-700 hover:tw-bg-red-600" 
             (click)="resetToDefaultWeights()">
             Reset 
+            <fa-icon 
+                  [icon]="faRotateRight" 
+                  class="tw-ml-1 tw-text-white">
+            </fa-icon>
           </button>
         </div>
 

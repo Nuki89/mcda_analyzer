@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk, faRotateRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 interface Criterion {
     name: string;
@@ -27,6 +27,8 @@ interface Criterion {
 export class AhpComponent  {
     // Fontawesome icons
     faTriangleExclamation = faTriangleExclamation;
+    faFloppyDisk = faFloppyDisk; 
+    faRotateRight = faRotateRight;
 
     title = "AHP";
     ahpData: any = {};
