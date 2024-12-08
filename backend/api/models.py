@@ -33,6 +33,16 @@ class AHPResult(models.Model):
         return f"AHP Result ({self.timestamp})"
     
 
+class TopsisResult(models.Model):
+    criteria = models.JSONField(default=list, help_text="Selected criteria with weights")  
+    weights = models.JSONField(default=list, help_text="Weights for each criterion")  
+    rankings = models.JSONField(default=list, help_text="Rankings with calculated scores")  
+    timestamp = models.DateTimeField(null=True ,auto_now_add=True) 
+
+    def __str__(self):
+        return f"Topsis Result ({self.timestamp})"
+
+
 class PrometheeResult(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     criteria = models.JSONField(default=list, help_text="Selected criteria with weights")
