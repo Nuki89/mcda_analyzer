@@ -133,7 +133,7 @@ class CachedFortuneDataView(viewsets.ModelViewSet):
 class AHPView(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            criteria = fetch_criteria('http://127.0.0.1:8000/criteria/')
+            criteria = fetch_criteria('http://127.0.0.1:8000/default-criteria/')
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
 
@@ -155,6 +155,8 @@ class AHPView(APIView):
                 "ahp_rankings": scores,
             }
             
+            self.save_ahp_result(result)
+
             return Response(result, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -192,10 +194,28 @@ class AHPView(APIView):
                 "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
                 "ahp_rankings": scores,
             }
+
+            self.save_ahp_result(result)
+
             return Response(result, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def save_ahp_result(self, scores):
+        AHPResult.objects.all().delete()
+
+        criteria_with_weights = scores['criteria_with_weights']
+        rankings = scores['ahp_rankings']
+
+        weights = [item['weight'] for item in criteria_with_weights]
+
+        AHPResult.objects.create(
+            criteria=criteria_with_weights,
+            weights=weights,
+            rankings=rankings,
+            timestamp=now() 
+        )
 
 
 # NOT WORKING...yet
@@ -203,11 +223,16 @@ class AHPResultViewSet(viewsets.ModelViewSet):
     queryset = AHPResult.objects.all()
     serializer_class = AHPResultSerializer
 
+    def get(self, request):
+        entries = AHPResult.objects.all().order_by('rank')
+        serializer = AHPResultSerializer(entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class TOPSISView(APIView):
     def get(self, request):
         try:
-            criteria = fetch_criteria('http://127.0.0.1:8000/criteria/')
+            criteria = fetch_criteria('http://127.0.0.1:8000/default-criteria/')
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
 
@@ -256,7 +281,7 @@ class PrometheeResultViewSet(viewsets.ModelViewSet):
 class PrometheeView(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            criteria_url = 'http://127.0.0.1:8000/criteria/'
+            criteria_url = 'http://127.0.0.1:8000/default-criteria/'
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             weights_param = request.query_params.get('weights', None)
             
@@ -330,6 +355,22 @@ class PrometheeView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def save_promethee_result(self, result):
+        PrometheeResult.objects.all().delete()
+
+        criteria_with_weights = result['criteria_with_weights']
+        rankings = result['promethee_rankings']
+
+        weights = [item['weight'] for item in criteria_with_weights]
+
+        PrometheeResult.objects.create(
+            criteria=criteria_with_weights,
+            weights=weights,
+            rankings=rankings,
+            timestamp=now() 
+        )
+
+
 # SAVING WEIGHTS AND CRITERIA NOT WORKING PROP.
     # def post(self, request, *args, **kwargs):
     #     try:
@@ -401,21 +442,7 @@ class PrometheeView(APIView):
     #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-    def save_promethee_result(self, result):
-        PrometheeResult.objects.all().delete()
-
-        criteria_with_weights = result['criteria_with_weights']
-        rankings = result['promethee_rankings']
-
-        weights = [item['weight'] for item in criteria_with_weights]
-
-        PrometheeResult.objects.create(
-            criteria=criteria_with_weights,
-            weights=weights,
-            rankings=rankings,
-            timestamp=now() 
-        )
-
+    
         # Save weights into Criteria table
         # for criterion in criteria_with_weights:
         #     try:

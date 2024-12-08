@@ -22,13 +22,15 @@ class Fortune500Entry(models.Model):
     def __str__(self):
         return f"{self.rank}: {self.name} - {self.sector} - {self.industry}"
 
-    
+
 class AHPResult(models.Model):
-    name = models.CharField(max_length=255)
-    score = models.FloatField()
+    criteria = models.JSONField(default=list, help_text="Selected criteria with weights")  
+    weights = models.JSONField(default=list, help_text="Weights for each criterion")  
+    rankings = models.JSONField(default=list, help_text="Rankings with calculated scores")  
+    timestamp = models.DateTimeField(null=True ,auto_now_add=True) 
 
     def __str__(self):
-        return f"{self.name} - {self.score}"
+        return f"AHP Result ({self.timestamp})"
     
 
 class PrometheeResult(models.Model):
