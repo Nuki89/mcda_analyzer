@@ -4,11 +4,17 @@ import { TopsisDataService } from '../../services/topsis-data.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk, faRotateRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DarkModeService } from '../../services/dark-mode.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
+
+interface Criterion {
+  name: string;
+  weight?: number; 
+  default_weight: number;
+}
 
 @Component({
   selector: 'app-topsis',
@@ -19,18 +25,23 @@ import { MatSelectModule } from '@angular/material/select';
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class TopsisComponent {
+  // Fontawesome icons
   faTriangleExclamation = faTriangleExclamation;
+  faRotateRight = faRotateRight;
+  faFloppyDisk = faFloppyDisk;
 
+  title = "Topsis";
   topsisData: any = {};
-  topThreeCompanies: { name: string; coefficient: number }[] = [];
-  showScores: boolean = false;
   selectedTopCount: number = 3; 
+  showScores: boolean = false;
+  topThreeCompanies: { name: string; coefficient: number }[] = [];
   topOptions: number[] = [3, 5, 10];
   weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
   weightSum: number = 0;
   criteriaWithWeights: { name: string; weight: number; active: boolean }[] = [];
   isDarkMode = false;
-  title = "Topsis";
+  isCalculating = false;
+  message: string | null = null;
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
@@ -60,6 +71,48 @@ export class TopsisComponent {
       }
     );
   }
+
+  // onFetchNoData(): void {
+  //   this.isCalculating = true;
+  //   this.message = null;
+
+  //   this.topsisDataService.triggerPrometheeCalculation().subscribe({
+  //     next: () => {
+  //       this.message = 'Promethee calculation completed successfully!';
+  //       this.isCalculating = false;
+  //       window.location.reload();
+  //     },
+  //     error: (err) => {
+  //       console.error('Promethee calculation failed:', err);
+  //       this.message = 'Failed to calculate Promethee. Please try again.';
+  //       this.isCalculating = false;
+  //     },
+  //   });
+  // }
+
+
+  resetToDefaultWeights() {
+    this.http.get<Criterion[]>('http://127.0.0.1:8000/default-criteria/')
+        .subscribe(
+            (defaultWeights) => {
+                if (!Array.isArray(defaultWeights)) {
+                    console.error('Invalid response format for default weights.');
+                    return;
+                }
+                this.criteriaWithWeights = defaultWeights.map(criterion => ({
+                    name: criterion.name,
+                    weight: criterion.default_weight, 
+                    active: true 
+                }));
+                this.calculateWeightSum();
+                this.saveWeights();
+            },
+            (error) => {
+                console.error('Error fetching default weights:', error);
+            }
+        );
+  }
+
 
   private calculateTopThreeCompanies() {
     if (this.topsisData.closeness_coefficients) {

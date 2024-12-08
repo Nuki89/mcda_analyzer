@@ -11,14 +11,6 @@
               <span class="tw-text-sm">Show scores</span>
                 <mat-checkbox [(ngModel)]="showScores" class="tw-bg-transparent tw-border-white/20"></mat-checkbox>
             </div>
-            
-            <!-- <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
-              <span class="tw-text-sm">Show top</span>
-              <select [(ngModel)]="selectedTopCount" class="tw-border tw-rounded tw-px-2 tw-py-1 tw-text-sm tw-w-18 tw-bg-transparent tw-border-white/30">
-                <option *ngFor="let option of topOptions" [value]="option">{{ option }}</option>
-              </select>
-
-            </div> -->
 
             <div class="tw-flex tw-items-center tw-gap-2 tw-mt-2">
               <div class="tw-text-sm">Show top</div>
@@ -117,13 +109,31 @@
             <button
               [disabled]="weightSum !== 1"
               [ngClass]="{
-                'tw-bg-violet-500 hover:tw-bg-violet-600': weightSum === 1,
-                'tw-bg-violet-300 cursor-not-allowed': weightSum !== 1
+                'tw-bg-violet-800 tw-text-white hover:tw-bg-violet-900': weightSum === 1,
+                'tw-bg-violet-400 tw-text-black cursor-not-allowed': weightSum !== 1
               }"
               class="tw-text-black tw-px-4 tw-py-2 tw-rounded"
               (click)="saveWeights()">
-              Save Weights
+              Save
+              <fa-icon 
+                [icon]="faFloppyDisk" 
+                [ngClass]="{
+                  'tw-text-white ': weightSum === 1,
+                  'tw-text-black cursor-not-allowed': weightSum !== 1
+                }">
+              </fa-icon>
             </button>
+
+            <button 
+              class="tw-ml-2 tw-text-white tw-px-4 tw-py-2 tw-rounded tw-bg-red-700 hover:tw-bg-red-600" 
+              (click)="resetToDefaultWeights()">
+              Reset 
+              <fa-icon 
+                [icon]="faRotateRight" 
+                class="tw-ml-1 tw-text-white">
+              </fa-icon>
+            </button>
+
           </div>
 
       </div>
