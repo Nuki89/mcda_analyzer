@@ -7,11 +7,16 @@ import { Observable } from 'rxjs';
 })
 export class TopsisDataService {
   private apiUrl = 'http://127.0.0.1:8000/topsis/';
+  private calculationUrl = 'http://127.0.0.1:8000/topsis/';
 
   constructor(private http: HttpClient) { }
 
   getTopsisdata(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
+  }
+
+  triggerTopsisCalculation(): Observable<any> {
+    return this.http.get<any>(this.calculationUrl);
   }
 
 }

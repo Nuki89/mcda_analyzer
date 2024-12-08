@@ -1,5 +1,5 @@
 ::ng-deep .toggle-active .mdc-switch__shadow {
-    background-color: rgb(0, 199, 0) !important; 
+    background-color: rebeccapurple !important; 
 }
 
 ::ng-deep .toggle-inactive .mdc-switch__shadow {
@@ -7,7 +7,7 @@
 }
 
 ::ng-deep .toggle-active .mdc-switch:enabled .mdc-switch__track::after {
-    background-color: rgb(0, 199, 0) !important; 
+    background-color: rebeccapurple !important; 
 }
 
 ::ng-deep .toggle-inactive .mdc-switch:enabled .mdc-switch__track::before {
@@ -15,7 +15,7 @@
 }
 
 ::ng-deep .dark-mode {
-    color:rgb(0, 199, 0);
+    color:rebeccapurple;
 }
 
 ::ng-deep .light-mode {
