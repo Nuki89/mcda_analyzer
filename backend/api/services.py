@@ -43,7 +43,6 @@ def get_criteria_with_fallback_test():
             {"name": "Change in Rank", "field": "change_in_rank", "default_weight": 0.1},
         ]
 
-        # Save fallback criteria to the database
         for criterion in fallback_criteria:
             Criteria.objects.create(
                 name=criterion['name'],
@@ -51,7 +50,6 @@ def get_criteria_with_fallback_test():
                 default_weight=criterion['default_weight']
             )
         
-        # Return the fallback criteria
         return fallback_criteria
 
     else:
@@ -86,18 +84,6 @@ def convert_to_float(value):
         return float(value.replace(",", "").replace("$", ""))
     except (ValueError, TypeError):
         return None
-
-
-# def convert_to_float(value):
-#     """
-#     Converts a value to float. Removes commas and dollar signs. Returns None if the value is None, empty, or '-'. 
-#     """
-#     if value in (None, '-', ''):  # Checks for '-', empty, or None values
-#         return None
-#     try:
-#         return float(value.replace(",", "").replace("$", ""))
-#     except (ValueError, TypeError):
-#         return None
 
 
 def fetch_criteria(api_url):
@@ -195,6 +181,44 @@ def calculate_topsis(data, weights, company_names, criteria_names):
     sorted_coefficients = [closeness_coefficients[i] for i in sorted_indices]
 
     return sorted_names, sorted_coefficients
+
+
+def perform_topsis_calculation(criteria_url, selected_criteria, weights_param, company_queryset):
+    # Step 1: Fetch and process criteria
+    criteria = fetch_criteria(criteria_url)  # Fetch default criteria from the provided URL
+    criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria)
+
+    # Step 2: Fetch company data
+    if not company_queryset.exists():
+        raise ValidationError("No data found. Please scrape data first.")
+
+    company_names = [entry.name for entry in company_queryset]
+    data_matrix = np.array([
+        [getattr(entry, c['field'], 0) or 0 for c in criteria]
+        for entry in company_queryset
+    ], dtype=float)
+
+    # Step 3: Process weights
+    weights = process_weights(weights_param, default_weights, len(criteria_names))
+
+    # Step 4: Perform TOPSIS calculation
+    sorted_names, closeness_coefficients = calculate_topsis(data_matrix, weights, company_names, criteria_names)
+
+    # Debugging: Check what is returned
+    print("Sorted Names:", sorted_names)
+    print("Closeness Coefficients:", closeness_coefficients)
+
+    # Step 5: Prepare the result
+    result = {
+        "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+        "topsis_rankings": [{"name": name, "closeness_coefficient": coeff}
+                            for name, coeff in zip(sorted_names, closeness_coefficients)],
+    }
+
+    print("Result:", result)
+
+    return result
+
 
 
 # PROMETHEE-Specific Function

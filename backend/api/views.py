@@ -218,7 +218,6 @@ class AHPView(APIView):
         )
 
 
-# NOT WORKING...yet
 class AHPResultViewSet(viewsets.ModelViewSet):
     queryset = AHPResult.objects.all()
     serializer_class = AHPResultSerializer
@@ -232,40 +231,92 @@ class AHPResultViewSet(viewsets.ModelViewSet):
 class TOPSISView(APIView):
     def get(self, request):
         try:
-            criteria = fetch_criteria('http://127.0.0.1:8000/default-criteria/')
+            criteria_url = 'http://127.0.0.1:8000/default-criteria/'
             selected_criteria_param = request.query_params.get('selected_criteria', None)
-            criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
-
-            entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
-            if not entries.exists():
-                return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
-            company_names = [entry.name for entry in entries]
-            data = np.array([
-                [getattr(entry, c['field'], 0) or 0 for c in criteria]
-                for entry in entries
-            ], dtype=float)
-
             weights_param = request.query_params.get('weights', None)
-            weights = process_weights(weights_param, default_weights, len(criteria_names))
+            company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
 
-            sorted_names, sorted_coefficients = calculate_topsis(data, weights, company_names, criteria_names)
+            result = perform_topsis_calculation(criteria_url, selected_criteria_param, weights_param, company_queryset)
 
-            result = {
-                "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
-                "closeness_coefficients": dict(zip(sorted_names, sorted_coefficients)),
-            }
+
+            self.save_topsis_result(result)
+
             return Response(result, status=status.HTTP_200_OK)
 
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
+            print("Exception:", str(e))
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# NOT WORKING...yet
-# class TopsisResultViewSet(viewsets.ModelViewSet):
-#     queryset = TospsisResult.objects.all()
-#     serializer_class = TospsisResulttSerializer
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            selected_criteria = data.get('selected_criteria', [])
+            weights = data.get('weights', [])
+
+            if not selected_criteria or not weights:
+                return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            criteria_url = 'http://127.0.0.1:8000/criteria/'
+            criteria = fetch_criteria(criteria_url)
+            criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
+
+            entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
+            if not entries.exists():
+                return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+
+            company_names = [entry.name for entry in entries]
+            data_matrix = np.array([
+                [getattr(entry, c['field'], 0) or 0 for c in criteria]
+                for entry in entries
+            ], dtype=float)
+
+            if len(weights) != len(criteria_names):
+                return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
+
+            sorted_names, sorted_coefficients = calculate_topsis(data_matrix, weights, company_names, criteria_names)
+
+            response_data = {
+                "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+                "topsis_rankings": [{"name": name, "closeness_coefficient": coeff}
+                                    for name, coeff in zip(sorted_names, sorted_coefficients)],
+            }
+
+            self.save_topsis_result(response_data)
+
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("Exception in POST:", str(e))
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def save_topsis_result(self, result):
+        TopsisResult.objects.all().delete()
+
+        criteria_with_weights = result['criteria_with_weights']
+        rankings = result['topsis_rankings']
+
+        weights = [item['weight'] for item in criteria_with_weights]
+
+        TopsisResult.objects.create(
+            criteria=criteria_with_weights,
+            weights=weights,
+            rankings=rankings,
+            timestamp=now() 
+        )
+
+
+class TopsisResultViewSet(viewsets.ModelViewSet):
+    queryset = TopsisResult.objects.all()
+    serializer_class = TopsisResultSerializer
+
+    def get(self, request):
+        entries = TopsisResult.objects.all().order_by('rank')
+        serializer = TopsisResultSerializer(entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class PrometheeResultViewSet(viewsets.ModelViewSet):
