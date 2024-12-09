@@ -1,1 +1,7 @@
-<p>wsm works!</p>
+<div *ngIf="!wsmData || wsmData.length === 0" class="tw-text-center tw-mt-10">
+    <p>
+        WSM data in progress
+        <fa-icon
+        [icon]="faSpinner" [spin]="true" [pulse]="true"></fa-icon>
+    </p>
+</div>
