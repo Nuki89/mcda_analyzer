@@ -32,13 +32,23 @@ export class MainDashboardComponent {
 
   private loadData() {
 
+    // this.ahpDataService.getAHPdata().subscribe(
+    //   (data) => {
+    //       this.ahpData = data;
+    //       console.log('AHP data:', this.ahpData);
+    //   },
+    //   (error) => {
+    //       console.error('Error fetching AHP data:', error);
+    //   }
+    // );
+
     this.ahpDataService.getAHPdata().subscribe(
-      (data) => {
-          this.ahpData = data;
-          console.log('AHP data:', this.ahpData);
+      (data: any) => {
+        this.ahpData = data;
+        console.log('AHP data:', this.ahpData);
       },
-      (error) => {
-          console.error('Error fetching AHP data:', error);
+      (error: any) => {
+        console.error('Error fetching AHP data:', error);
       }
     );
 

@@ -8,7 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
-import { faCalculator, faRotateRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faCalculator, faFloppyDisk, faRotateRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 interface Criterion {
   name: string;
@@ -28,6 +28,7 @@ export class PrometheeComponent {
   faCalculator = faCalculator
   faRotateRight = faRotateRight;
   faTriangleExclamation = faTriangleExclamation;
+  faFloppyDisk = faFloppyDisk; 
 
   title = 'Promethee';
   prometheeData: any = {};
@@ -48,9 +49,11 @@ export class PrometheeComponent {
     private cdr: ChangeDetectorRef,
     ) {}
 
+
   get themeClass() {
     return this.darkService.isDarkMode ? 'dark-mode' : 'light-mode';
   }
+
 
   async ngAfterViewInit() {
     this.loadData();
@@ -61,6 +64,12 @@ export class PrometheeComponent {
     this.prometheeDataService.getPrometheeData().subscribe(
         (data: any) => {
             this.prometheeData = data;
+            
+            if (!this.prometheeData) {
+              this.onFetchNoData();
+              console.log('Promethee data fetched!');
+            }
+
             console.log('Promethee data loaded:', data);
 
             this.criteriaWithWeights = this.extractCriteriaWithWeights(this.prometheeData);

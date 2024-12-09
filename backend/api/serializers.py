@@ -20,6 +20,12 @@ class AHPResultSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TopsisResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TopsisResult
+        fields = '__all__'
+
+
 class PrometheeResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrometheeResult

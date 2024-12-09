@@ -67,7 +67,7 @@
                   </td>
                   <td 
                     class="tw-py-2 tw-px-4" 
-                    [ngStyle]="!criterion.active ? {'text-decoration': 'line-through'} : {}">
+                    >
                     {{ criterion.name }}
                   </td> 
                   <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
@@ -111,36 +111,34 @@
               <button
                 [disabled]="weightSum !== 1"
                 [ngClass]="{
-                  'tw-bg-violet-700 tw-text-white hover:tw-bg-violet-800': weightSum === 1,
-                  'tw-bg-violet-300 cursor-not-allowed': weightSum !== 1
+                  'tw-bg-violet-800 tw-text-white hover:tw-bg-violet-900': weightSum === 1,
+                  'tw-bg-violet-400 tw-text-black cursor-not-allowed': weightSum !== 1
                 }"
-                class="tw-text-black tw-px-4 tw-py-2 tw-rounded"
+                class="tw-text-white tw-px-4 tw-py-2 tw-rounded"
                 (click)="saveWeights()">
-                Calculation   
+                Save   
                 <fa-icon 
-                  [icon]="faCalculator" 
-                  class="tw-text-white">
+                  [icon]="faFloppyDisk" 
+                  [ngClass]="{
+                    'tw-text-white ': weightSum === 1,
+                    'tw-text-black cursor-not-allowed': weightSum !== 1
+                  }">
                 </fa-icon>
               </button>
+              
               <button 
-              class="tw-ml-2 tw-text-black tw-px-6 tw-py-2 tw-rounded tw-bg-gray-400 hover:tw-bg-gray-500" 
-              (click)="onFetchNoData()" 
-              [disabled]="isCalculating">
-                {{ isCalculating ? 'Calculating...' : 'Fetch' }}
-              </button>
-              <button 
-                class="tw-ml-2 tw-text-black tw-px-4 tw-py-2 tw-rounded tw-bg-red-500 hover:tw-bg-red-600" 
+                class="tw-ml-2 tw-text-white tw-px-4 tw-py-2 tw-rounded tw-bg-red-700 hover:tw-bg-red-600" 
                 (click)="resetToDefaultWeights()">
                 Reset 
                 <fa-icon 
                   [icon]="faRotateRight" 
-                  class="tw-text-black">
+                  class="tw-ml-1 tw-text-white">
                 </fa-icon>
               </button>
 
             </div>
     
-        
+          
 
     </div>
 
