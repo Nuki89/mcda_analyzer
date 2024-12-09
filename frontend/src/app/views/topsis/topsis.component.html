@@ -31,7 +31,7 @@
                       <li *ngFor="let company of topThreeCompanies" class="tw-inline-block tw-border tw-p-2 tw-rounded-lg">
                           <strong>{{ company.name }}</strong>
                           <span *ngIf="showScores" class="tw-transition-opacity tw-duration-300 tw-opacity-100">
-                            : {{ company.coefficient | number:'1.2-4' }}
+                            : {{ company.closeness_coefficient | number:'1.2-4' }}
                           </span>
                       </li>
                   </ol>

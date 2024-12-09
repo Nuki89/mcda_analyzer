@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TopsisDataService {
-  private apiUrl = 'http://127.0.0.1:8000/topsis/';
+  private apiUrl = 'http://127.0.0.1:8000/topsis-results/';
   private calculationUrl = 'http://127.0.0.1:8000/topsis/';
 
   constructor(private http: HttpClient) { }

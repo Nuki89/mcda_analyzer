@@ -34,7 +34,7 @@ export class TopsisComponent {
   topsisData: any = {};
   selectedTopCount: number = 3; 
   showScores: boolean = false;
-  topThreeCompanies: { name: string; coefficient: number }[] = [];
+  topThreeCompanies: { name: string; closeness_coefficient: number }[] = [];
   topOptions: number[] = [3, 5, 10];
   weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
   weightSum: number = 0;
@@ -90,13 +90,13 @@ export class TopsisComponent {
 
     this.topsisDataService.triggerTopsisCalculation().subscribe({
       next: () => {
-        this.message = 'Promethee calculation completed successfully!';
+        this.message = 'Topsis calculation completed successfully!';
         this.isCalculating = false;
         window.location.reload();
       },
       error: (err) => {
-        console.error('Promethee calculation failed:', err);
-        this.message = 'Failed to calculate Promethee. Please try again.';
+        console.error('Topsis calculation failed:', err);
+        this.message = 'Failed to calculate Topsis. Please try again.';
         this.isCalculating = false;
       },
     });
@@ -126,13 +126,48 @@ export class TopsisComponent {
   }
 
 
+  private extractCriteriaWithWeights(data: any): { name: string; weight: number; active: boolean }[] {
+    let criteria = [];
+
+    if (Array.isArray(data)) {
+        criteria = data[0]?.criteria || [];
+    } else if (data.criteria_with_weights) {
+        criteria = data.criteria_with_weights;
+    } else {
+        console.warn('Criteria is missing in the data.');
+        return [];
+    }
+
+    return criteria.map((criterion: any) => ({
+        name: criterion.name,
+        weight: criterion.weight,
+        active: true,
+    }));
+  }
+
+
   private calculateTopThreeCompanies() {
-    if (this.topsisData.closeness_coefficients) {
-      const coefficients = Object.entries(this.topsisData.closeness_coefficients);
-      this.topThreeCompanies = coefficients
-        .map(([name, coefficient]: [string, unknown]) => ({ name, coefficient: Number(coefficient) }))
-        .sort((a, b) => b.coefficient - a.coefficient)
-        .slice(0, this.selectedTopCount);
+    let rankings;
+
+    if (Array.isArray(this.topsisData)) {
+        rankings = this.topsisData[0]?.rankings; 
+    } else {
+        rankings = this.topsisData.topsis_rankings;
+    }
+
+    if (Array.isArray(rankings) && rankings.length > 0) {
+        this.topThreeCompanies = rankings
+            .map((ranking: any) => ({
+                name: ranking.name,
+                closeness_coefficient: ranking.closeness_coefficient,
+            }))
+            .sort((a: { name: string; closeness_coefficient: number }, b: { name: string; closeness_coefficient: number }) => b.closeness_coefficient - a.closeness_coefficient)
+            .slice(0, this.selectedTopCount);
+
+        console.log('Top Three Companies:', this.topThreeCompanies);
+    } else {
+        console.warn("Topsis Rankings are missing or empty.");
+        this.topThreeCompanies = [];
     }
   }
 
@@ -144,13 +179,6 @@ export class TopsisComponent {
   }
   
 
-  private calculateWeightSum() {
-    const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
-    this.weightSum = activeCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);
-    this.weightSum = Math.round(this.weightSum * 1000) / 1000;
-  }
-
-
   saveWeights() {
     const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
 
@@ -159,7 +187,8 @@ export class TopsisComponent {
       return;
     }
 
-    const selectedCriteria = activeCriteria.map(c => c.name).join(',');
+    // const selectedCriteria = activeCriteria.map(c => c.name).join(',');
+    const selectedCriteria = activeCriteria.map(c => c.name);
     const weights = activeCriteria.map(c => c.weight);
 
     const sumOfWeights = weights.reduce((a, b) => a + b, 0);
@@ -170,14 +199,26 @@ export class TopsisComponent {
       return;
     }
 
-    const queryParam = `selected_criteria=${selectedCriteria}&weights=${weights.join(',')}`;
+    const payload = {
+      selected_criteria: selectedCriteria,
+      weights: weights
+    };
+    console.log('Payload:', payload);
+
 
     this.http
-      .get(`http://127.0.0.1:8000/topsis/?${queryParam}`)
+      .post('http://127.0.0.1:8000/topsis/', payload)
       .subscribe(
         (data: any) => {
+          console.log('Backend Response:', data);
           this.topsisData = data;
           this.calculateTopThreeCompanies(); 
+
+          const savePayload = {
+            criteria: data.criteria,
+            rankings: data.rankings,
+          };
+
         },
         (error) => {
           console.error('Error updating weights and criteria:', error);
@@ -192,16 +233,15 @@ export class TopsisComponent {
   }
 
 
-  onToggleChange() {
-    this.calculateWeightSum();
+  private calculateWeightSum() {
+    const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
+    this.weightSum = activeCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);
+    this.weightSum = Math.round(this.weightSum * 1000) / 1000;
   }
 
 
-  private extractCriteriaWithWeights(data: any): { name: string; weight: number; active: boolean }[] {
-    return (data.criteria_with_weights || []).map((criterion: any) => ({
-      ...criterion,
-      active: true,
-    }));
+  onToggleChange() {
+    this.calculateWeightSum();
   }
 
 
