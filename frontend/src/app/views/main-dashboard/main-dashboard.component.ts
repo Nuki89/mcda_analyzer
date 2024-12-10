@@ -6,6 +6,7 @@ import { ScrapingDataComponent } from '../../components/scraping-data/scraping-d
 import { AhpDataService } from '../../services/ahp-data.service';
 import { TopsisDataService } from '../../services/topsis-data.service';
 import { PrometheeDataService } from '../../services/promethee-data.service';
+import { WsmDataService } from '../../services/wsm-data.service';
 
 @Component({
   selector: 'app-main-dashboard',
@@ -18,11 +19,13 @@ export class MainDashboardComponent {
   ahpData: any = {};
   prometheeData: any = {};
   topsisData: any = {};
+  wsmData: any = {};
 
   constructor(
     private ahpDataService: AhpDataService,
     private prometheeDataService: PrometheeDataService,
     private topsisDataService: TopsisDataService,
+    private wsmDataService: WsmDataService,
     @Inject(HttpClient) private http: HttpClient,
   ) {}
 
@@ -31,16 +34,6 @@ export class MainDashboardComponent {
   }
 
   private loadData() {
-
-    // this.ahpDataService.getAHPdata().subscribe(
-    //   (data) => {
-    //       this.ahpData = data;
-    //       console.log('AHP data:', this.ahpData);
-    //   },
-    //   (error) => {
-    //       console.error('Error fetching AHP data:', error);
-    //   }
-    // );
 
     this.ahpDataService.getAHPdata().subscribe(
       (data: any) => {
@@ -69,6 +62,16 @@ export class MainDashboardComponent {
       },
       (error: any) => {
         console.error('Error fetching Promethee data:', error);
+      }
+    );
+
+    this.wsmDataService.getWSMdata().subscribe(
+      (data: any) => {
+        this.wsmData = data;
+        console.log('WSM data:', this.wsmData);
+      },
+      (error: any) => {
+        console.error('Error fetching WSM data:', error);
       }
     );
     
