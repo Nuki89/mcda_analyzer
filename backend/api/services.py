@@ -310,3 +310,29 @@ def perform_promethee_calculation(criteria_url, selected_criteria, weights_param
         "promethee_rankings": scores,
     }
     return result
+
+
+def calculate_wsm(data, weights, alternative_names, criteria_names):
+    """
+    Calculate WSM scores for alternatives.
+
+    Args:
+        data (numpy.ndarray): Matrix of alternative data.
+        weights (numpy.ndarray): Criteria weights.
+        alternative_names (list): Names of the alternatives.
+        criteria_names (list): Names of criteria.
+
+    Returns:
+        list: Sorted scores with alternative names.
+    """
+    # Normalize weights (if they aren't already normalized to sum to 1)
+    normalized_weights = weights / np.sum(weights)
+    
+    # Calculate weighted sum for each alternative
+    weighted_data = data * normalized_weights
+    scores = weighted_data.sum(axis=1)
+
+    # Prepare sorted results
+    alternative_scores = [{"name": name, "score": score} for name, score in zip(alternative_names, scores)]
+    alternative_scores.sort(key=lambda x: x["score"], reverse=True)
+    return alternative_scores
