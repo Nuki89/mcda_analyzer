@@ -406,6 +406,16 @@ class PrometheeView(APIView):
         )
 
 
+class WSMResultViewSet(viewsets.ModelViewSet):
+    queryset = WSMResult.objects.all()
+    serializer_class = WSMResultSerializer
+
+    def get(self, request):
+        entries = WSMResult.objects.all().order_by('rank')
+        serializer = WSMResultSerializer(entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class WSMView(APIView):
     def get(self, request, *args, **kwargs):
         try:
@@ -419,6 +429,8 @@ class WSMView(APIView):
                 criteria_url, selected_criteria_param, weights_param, company_queryset
             )
 
+            self.save_wsm_result(result)
+
             return Response(result, status=status.HTTP_200_OK)
 
         except ValueError as e:
@@ -426,4 +438,18 @@ class WSMView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    def save_wsm_result(self, result):
+        WSMResult.objects.all().delete()
+
+        criteria_with_weights = result['criteria_with_weights']
+        rankings = result['wsm_rankings']
+
+        weights = [item['weight'] for item in criteria_with_weights]
+
+        WSMResult.objects.create(
+            criteria=criteria_with_weights,
+            weights=weights,
+            rankings=rankings,
+            timestamp=now() 
+        )
     

@@ -17,6 +17,7 @@ router.register(r'scraped-data', views.CachedFortuneDataView, basename='scraped-
 router.register(r'ahp-results', AHPResultViewSet, basename='ahp-results'),
 router.register(r'topsis-results', TopsisResultViewSet, basename='topsis-results'),
 router.register(r'promethee-results', PrometheeResultViewSet, basename='promethee-results')
+router.register(r'wsm-results', WSMResultViewSet, basename='wsm-results')
 router.register(r'criteria', views.CriteriaWeightsView, basename='criteria')
 router.register(r'default-criteria', views.CriteriaDBView, basename='criteria-db')
 
