@@ -422,6 +422,37 @@ class PrometheeView(APIView):
         )
 
 
+class WSMView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            criteria = fetch_criteria('http://127.0.0.1:8000/default-criteria/')
+            selected_criteria_param = request.query_params.get('selected_criteria', None)
+            criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
+
+            entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
+            if not entries.exists():
+                return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+
+            alternative_names = [entry.name for entry in entries]
+
+            data_matrix = np.array([
+                [getattr(entry, c['field'], 0) or 0 for c in criteria]
+                for entry in entries
+            ], dtype=float)
+            weights = default_weights
+            scores = calculate_wsm(data_matrix, weights, alternative_names, criteria_names)
+
+            result = {
+                "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+                "wsm_rankings": scores,
+            }
+
+            return Response(result, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
 # SAVING WEIGHTS AND CRITERIA NOT WORKING PROP.
     # def post(self, request, *args, **kwargs):
     #     try:

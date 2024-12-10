@@ -27,4 +27,5 @@ urlpatterns = [
     path('topsis/', TOPSISView.as_view(), name='topsis-method'),
     path('ahp/', AHPView.as_view(), name='ahp-view'),
     path('promethee/', PrometheeView.as_view(), name='promethee-method'),
+    path('wsm/', WSMView.as_view(), name='wsm-method'),
 ]
