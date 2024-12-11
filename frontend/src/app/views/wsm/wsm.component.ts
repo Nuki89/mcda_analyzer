@@ -10,6 +10,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
+interface Criterion {
+  name: string;
+  weight?: number; 
+  default_weight: number;
+}
+
 @Component({
   selector: 'app-wsm',
   standalone: true,
@@ -207,6 +213,28 @@ export class WsmComponent {
 
   onToggleChange() {
       this.calculateWeightSum();
+  }
+
+  resetToDefaultWeights() {
+    this.http.get<Criterion[]>('http://127.0.0.1:8000/default-criteria/')
+        .subscribe(
+            (defaultWeights) => {
+                if (!Array.isArray(defaultWeights)) {
+                    console.error('Invalid response format for default weights.');
+                    return;
+                }
+                this.criteriaWithWeights = defaultWeights.map(criterion => ({
+                    name: criterion.name,
+                    weight: criterion.default_weight, 
+                    active: true 
+                }));
+                this.calculateWeightSum();
+                this.saveWeights();
+            },
+            (error) => {
+                console.error('Error fetching default weights:', error);
+            }
+        );
   }
 
 }
