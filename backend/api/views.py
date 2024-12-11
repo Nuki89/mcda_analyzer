@@ -343,15 +343,6 @@ class PrometheeView(APIView):
             selected_criteria = data.get('selected_criteria', [])
             weights = data.get('weights', [])
 
-            if not isinstance(selected_criteria, list) or not isinstance(weights, list):
-                return Response({"error": "selected_criteria and weights must be arrays."}, status=status.HTTP_400_BAD_REQUEST)
-
-            if not selected_criteria or not weights:
-                return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-            if len(weights) != len(selected_criteria):
-                return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
-
             weights = list(map(float, weights))  
             if not np.isclose(sum(weights), 1.0):
                 return Response({"error": "Weights must sum to 1."}, status=status.HTTP_400_BAD_REQUEST)
