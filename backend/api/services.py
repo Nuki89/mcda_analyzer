@@ -338,28 +338,20 @@ def calculate_wsm(data, weights, alternative_names, criteria_names):
     return alternative_scores
 
 
-def perform_wsm_calculation(criteria_url, selected_criteria_param, weights_param, company_queryset):
+def perform_wsm_calculation(criteria_url, selected_criteria, weights, company_queryset):
     criteria = fetch_criteria(criteria_url)
-    criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
+    criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria)
 
     if not company_queryset.exists():
         raise ValueError("No data found. Please scrape data first.")
 
-    if weights_param:
-        weights = np.array(list(map(float, weights_param.split(','))))
-        if len(weights) != len(criteria):
-            raise ValidationError("The number of weights must match the number of selected criteria.")
-    else:
-        weights = default_weights  
-
-    alternative_names = [entry.name for entry in company_queryset]
-
+    weights = list(map(float, weights))
     data_matrix = np.array([
         [getattr(entry, c['field'], 0) or 0 for c in criteria]
         for entry in company_queryset
     ], dtype=float)
 
-    scores = calculate_wsm(data_matrix, weights, alternative_names, criteria_names)
+    scores = calculate_wsm(data_matrix, weights, [entry.name for entry in company_queryset], criteria_names)
 
     result = {
         "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
