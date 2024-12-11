@@ -65,7 +65,7 @@ export class WsmComponent {
 
         this.criteriaWithWeights = this.extractCriteriaWithWeights(this.wsmData);
 
-        // this.calculateWeightSum();
+        this.calculateWeightSum();
         this.calculateTopThreeCompanies();
         },
         (error: any) => {
@@ -146,5 +146,67 @@ export class WsmComponent {
       this.cdr.detectChanges(); 
   }
 
+
+  saveWeights() {
+    const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
+  
+    if (activeCriteria.length === 0) {
+      alert('At least one criterion must be active.');
+      return;
+    }
+  
+    const selectedCriteria = activeCriteria.map(c => c.name);
+    const weights = activeCriteria.map(c => c.weight);
+  
+    const sumOfWeights = weights.reduce((a, b) => a + b, 0);
+    const roundedSum = Math.round(sumOfWeights * 1000) / 1000;
+  
+    if (roundedSum !== 1) {
+      alert(`Weights must sum to 1. Current sum: ${roundedSum}`);
+      return;
+    }
+  
+    const payload = {
+      selected_criteria: selectedCriteria,
+      weights: weights
+    };
+    console.log('Payload:', payload);
+
+    this.http
+        .post('http://127.0.0.1:8000/wsm/', payload)
+        .subscribe(
+            (data: any) => {
+                this.wsmData = data;
+                this.calculateTopThreeCompanies();
+
+                const savePayload = {
+                    criteria_with_weights: data.criteria_with_weights,
+                    wsm_rankings: data.wsm_rankings,
+                };
+        
+            },
+            (error) => {
+            console.error('Error updating weights and criteria:', error);
+            }
+        );  
+  }
+
+
+  updateWeight(index: number, weight: number) {
+      this.criteriaWithWeights[index].weight = parseFloat(weight.toString()) || 0;
+      this.calculateWeightSum();
+  }
+
+
+  private calculateWeightSum() {
+      const activeCriteria = this.criteriaWithWeights.filter(c => c.active);
+      this.weightSum = activeCriteria.reduce((sum, criterion) => sum + criterion.weight, 0);
+      this.weightSum = Math.round(this.weightSum * 1000) / 1000;
+  }
+
+
+  onToggleChange() {
+      this.calculateWeightSum();
+  }
 
 }

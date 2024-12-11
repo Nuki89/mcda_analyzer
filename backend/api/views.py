@@ -438,6 +438,67 @@ class WSMView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    # def post(self, request, *args, **kwargs):
+    #     try:
+    #         criteria_url = 'http://127.0.0.1:8000/default-criteria/'
+    #         selected_criteria_param = request.query_params.get('selected_criteria', None)
+    #         weights_param = request.query_params.get('weights', None)
+
+    #         company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
+
+    #         result = perform_wsm_calculation(
+    #             criteria_url, selected_criteria_param, weights_param, company_queryset
+    #         )
+
+    #         self.save_wsm_result(result)
+
+    #         return Response(result, status=status.HTTP_200_OK)
+
+    #     except Exception as e:
+    #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            selected_criteria = data.get('selected_criteria', [])
+            weights = data.get('weights', [])
+
+            if not selected_criteria or not weights:
+                return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            criteria = fetch_criteria('http://127.0.0.1:8000/criteria/')
+            criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
+
+            entries = Fortune500Entry.objects.order_by('last_scraped')[:20]
+            if not entries.exists():
+                return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+
+            company_names = [entry.name for entry in entries]
+            data_matrix = np.array([
+                [getattr(entry, c['field'], 0) or 0 for c in criteria]
+                for entry in entries
+            ], dtype=float)
+
+            if len(weights) != len(criteria_names):
+                return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
+
+            weights = list(map(float, weights))
+            scores = calculate_wsm(data_matrix, weights, company_names, criteria_names)
+
+            result = {
+                "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+                "wsm_rankings": scores,
+            }
+
+            self.save_wsm_result(result)
+
+            return Response(result, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
     def save_wsm_result(self, result):
         WSMResult.objects.all().delete()
 
