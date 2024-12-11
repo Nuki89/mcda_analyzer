@@ -30,3 +30,11 @@ class PrometheeResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrometheeResult
         fields = '__all__'
+
+
+class WSMResultSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = WSMResult
+        fields = '__all__'

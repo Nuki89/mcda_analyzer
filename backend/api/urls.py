@@ -17,6 +17,7 @@ router.register(r'scraped-data', views.CachedFortuneDataView, basename='scraped-
 router.register(r'ahp-results', AHPResultViewSet, basename='ahp-results'),
 router.register(r'topsis-results', TopsisResultViewSet, basename='topsis-results'),
 router.register(r'promethee-results', PrometheeResultViewSet, basename='promethee-results')
+router.register(r'wsm-results', WSMResultViewSet, basename='wsm-results')
 router.register(r'criteria', views.CriteriaWeightsView, basename='criteria')
 router.register(r'default-criteria', views.CriteriaDBView, basename='criteria-db')
 
@@ -27,4 +28,5 @@ urlpatterns = [
     path('topsis/', TOPSISView.as_view(), name='topsis-method'),
     path('ahp/', AHPView.as_view(), name='ahp-view'),
     path('promethee/', PrometheeView.as_view(), name='promethee-method'),
+    path('wsm/', WSMView.as_view(), name='wsm-method'),
 ]

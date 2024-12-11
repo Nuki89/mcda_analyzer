@@ -48,22 +48,6 @@ class CriteriaDBView(viewsets.ModelViewSet):
         return Response(criteria, status=status.HTTP_200_OK)
 
 
-# class CriteriaWeightsView(ViewSet):
-#     def list(self, request):
-#         criteria = list(Criteria.objects.all().values('name', 'field', 'default_weight'))
-#         logger.info(f"Fetched criteria from database: {criteria}")
-
-#         return Response(criteria, status=status.HTTP_200_OK)
-
-
-# class CriteriaDBView(viewsets.ViewSet):
-#     def list(self, request, *args, **kwargs):
-#         criteria = get_criteria_with_fallback()
-#         logger.info(f"Fetched hardcoded default criteria: {criteria}")
-
-#         return Response(criteria, status=status.HTTP_200_OK)
-
-
 class ScrapeFortuneDataView(APIView):
     queryset = Fortune500Entry.objects.all()
     serializer_class = Fortune500EntrySerializer
@@ -359,15 +343,6 @@ class PrometheeView(APIView):
             selected_criteria = data.get('selected_criteria', [])
             weights = data.get('weights', [])
 
-            if not isinstance(selected_criteria, list) or not isinstance(weights, list):
-                return Response({"error": "selected_criteria and weights must be arrays."}, status=status.HTTP_400_BAD_REQUEST)
-
-            if not selected_criteria or not weights:
-                return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-            if len(weights) != len(selected_criteria):
-                return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
-
             weights = list(map(float, weights))  
             if not np.isclose(sum(weights), 1.0):
                 return Response({"error": "Weights must sum to 1."}, status=status.HTTP_400_BAD_REQUEST)
@@ -422,94 +397,75 @@ class PrometheeView(APIView):
         )
 
 
-# SAVING WEIGHTS AND CRITERIA NOT WORKING PROP.
-    # def post(self, request, *args, **kwargs):
-    #     try:
-    #         data = request.data
+class WSMResultViewSet(viewsets.ModelViewSet):
+    queryset = WSMResult.objects.all()
+    serializer_class = WSMResultSerializer
 
-    #         selected_criteria = data.get('selected_criteria', [])
-    #         weights = data.get('weights', [])
-
-    #         if not isinstance(selected_criteria, list) or not isinstance(weights, list):
-    #             return Response({"error": "selected_criteria and weights must be arrays."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         if not selected_criteria or not weights:
-    #             return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         if len(weights) != len(selected_criteria):
-    #             return Response({"error": "The number of weights does not match the number of criteria."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         weights = list(map(float, weights))  
-    #         if not np.isclose(sum(weights), 1.0):
-    #             return Response({"error": "Weights must sum to 1."}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         # Update criteria weights in the database
-    #         for criterion_name, weight in zip(selected_criteria, weights):
-    #             try:
-    #                 criteria_obj = Criteria.objects.filter(name=criterion_name).first()
-    #                 if criteria_obj:
-    #                     logger.info(f"Before update: {criteria_obj.name} - {criteria_obj.default_weight}")
-    #                     criteria_obj.default_weight = weight
-    #                     criteria_obj.save()
-    #                     logger.info(f"After update: {criteria_obj.name} - {criteria_obj.default_weight}")
-    #                 else:
-    #                     logger.warning(f"Criterion '{criterion_name}' not found in the database.")
-    #             except Exception as e:
-    #                 logger.error(f"Error updating criterion '{criterion_name}': {e}")
+    def get(self, request):
+        entries = WSMResult.objects.all().order_by('rank')
+        serializer = WSMResultSerializer(entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-    #         criteria_url = 'http://127.0.0.1:8000/criteria/'
-    #         criteria = fetch_criteria(criteria_url)
-    #         criteria, criteria_names, default_weights = process_criteria(criteria, ','.join(selected_criteria))
+class WSMView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            criteria_url = 'http://127.0.0.1:8000/default-criteria/'
+            selected_criteria_param = request.query_params.get('selected_criteria', None)
+            weights_param = request.query_params.get('weights', None)
 
-    #         company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
-    #         if not company_queryset.exists():
-    #             return Response({"error": "No company data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+            company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
 
-    #         data_matrix = np.array([
-    #             [
-    #                 convert_to_float(getattr(entry, c['field'], 0)) or 0 
-    #                 for c in criteria
-    #             ]
-    #             for entry in company_queryset
-    #         ], dtype=float)
-            
-    #         criteria_directions = [1 if c['field'].endswith('_benefit') else -1 for c in criteria]
+            result = perform_wsm_calculation(
+                criteria_url, selected_criteria_param, weights_param, company_queryset
+            )
 
-    #         result = calculate_promethee(data_matrix, weights, [entry.name for entry in company_queryset], criteria_directions)
+            self.save_wsm_result(result)
 
-    #         response_data = {
-    #             "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
-    #             "promethee_rankings": result,
-    #         }
+            return Response(result, status=status.HTTP_200_OK)
 
-    #         self.save_promethee_result(response_data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            selected_criteria = data.get('selected_criteria', [])
+            weights = data.get('weights', [])
 
-    #         return Response(response_data, status=status.HTTP_200_OK)
+            if not selected_criteria or not weights:
+                return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    #     except ValidationError as e:
-    #         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    #     except Exception as e:
-    #         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            criteria_url = 'http://127.0.0.1:8000/criteria/'
+            company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
 
+            result = perform_wsm_calculation(
+                criteria_url, ','.join(selected_criteria), weights, company_queryset
+            )
 
+            self.save_wsm_result(result)
+
+            return Response(result, status=status.HTTP_200_OK)
+
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def save_wsm_result(self, result):
+        WSMResult.objects.all().delete()
+
+        criteria_with_weights = result['criteria_with_weights']
+        rankings = result['wsm_rankings']
+
+        weights = [item['weight'] for item in criteria_with_weights]
+
+        WSMResult.objects.create(
+            criteria=criteria_with_weights,
+            weights=weights,
+            rankings=rankings,
+            timestamp=now() 
+        )
     
-        # Save weights into Criteria table
-        # for criterion in criteria_with_weights:
-        #     try:
-        #         criteria_obj = Criteria.objects.filter(name__iexact=criterion['name']).first()
-        #         if criteria_obj:
-        #             logger.info(f"Updating criterion '{criteria_obj.name}' with new weight: {criterion['weight']}")
-        #             criteria_obj.default_weight = criterion['weight']
-        #             criteria_obj.save()
-        #         else:
-        #             logger.warning(f"Criterion '{criterion['name']}' not found in the database. Creating it.")
-                
-        #             Criteria.objects.create(
-        #                 name=criterion['name'],
-        #                 field=criterion['name'].lower(),
-        #                 default_weight=criterion['weight']
-        #             )
-        #     except Exception as e:
-        #         logger.error(f"Error updating or creating criterion '{criterion['name']}': {e}")
-

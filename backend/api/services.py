@@ -310,3 +310,52 @@ def perform_promethee_calculation(criteria_url, selected_criteria, weights_param
         "promethee_rankings": scores,
     }
     return result
+
+
+def calculate_wsm(data, weights, alternative_names, criteria_names):
+    """
+    Calculate WSM scores for alternatives.
+
+    Args:
+        data (numpy.ndarray): Matrix of alternative data.
+        weights (numpy.ndarray): Criteria weights.
+        alternative_names (list): Names of the alternatives.
+        criteria_names (list): Names of criteria.
+
+    Returns:
+        list: Sorted scores with alternative names.
+    """
+    # Normalize weights (if they aren't already normalized to sum to 1)
+    normalized_weights = weights / np.sum(weights)
+    
+    # Calculate weighted sum for each alternative
+    weighted_data = data * normalized_weights
+    scores = weighted_data.sum(axis=1)
+
+    # Prepare sorted results
+    alternative_scores = [{"name": name, "score": score} for name, score in zip(alternative_names, scores)]
+    alternative_scores.sort(key=lambda x: x["score"], reverse=True)
+    return alternative_scores
+
+
+def perform_wsm_calculation(criteria_url, selected_criteria, weights, company_queryset):
+    criteria = fetch_criteria(criteria_url)
+    criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria)
+
+    if not company_queryset.exists():
+        raise ValueError("No data found. Please scrape data first.")
+
+    weights = list(map(float, weights))
+    data_matrix = np.array([
+        [getattr(entry, c['field'], 0) or 0 for c in criteria]
+        for entry in company_queryset
+    ], dtype=float)
+
+    scores = calculate_wsm(data_matrix, weights, [entry.name for entry in company_queryset], criteria_names)
+
+    result = {
+        "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
+        "wsm_rankings": scores,
+    }
+
+    return result
