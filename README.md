@@ -9,7 +9,26 @@ Project implements Multi-Criteria Decision Analysis (MCDA) methods for decision 
 - PROMETHEE (Preference Ranking Organization Method for Enrichment Evaluations)
 - WSM (Weighted Sum Model)
 
-## Pre-requisites
+## Docker setup
+> [!IMPORTANT]
+> Requred Docker and Docker Compose installed on your machine.
+1. **Build Docker Images:**
+   ```bash
+   docker compose build
+   ```
+
+2. **Run Containers:**
+   ```bash
+   docker compose up
+   ```
+
+3. **Stop Containers:**
+   ```bash
+   docker compose down
+   ```
+
+## Development setup
+### Pre-requisites
 - Python 3.11.4 or higher
 
 ## Installation backend (Django)
@@ -40,9 +59,8 @@ python3 manage.py runserver
 
 ### For Windows
 1. **Create and Activate Virtual Environment:** 
-```diff
-- RUN POWERSHELL AS ADMINISTRATOR
-```
+> [!IMPORTANT]
+> RUN POWERSHELL AS ADMINISTRATOR
 ```bash
 cd backend
 python -m venv venv
@@ -63,14 +81,15 @@ python manage.py runserver
 ```
 
 ## Installation frontend (Angular)
-**Install npm and Angular CLI:**
+> [!IMPORTANT]
+> Install npm and Angular CLI before installing dependencies.
 ```bash
 sudo apt install npm
 sudo npm install -g @angular/cli@18
 ```
 
 1. **Install Angular Dependencies:**
-Before installing dependencies remove existing modules and than reinstall them. 
+Before installing dependencies remove existing modules and than reinstall them (if needed). 
 If you already had npm installed first run this command: `rm -rf node_modules`
 ```bash
 npm i
@@ -88,6 +107,11 @@ ng s -o
 ## Start both frontend and backend with one command
 First add permission to execute the script
 ```bash
+chmod +x start-linux.sh
+./start-linux.sh
+```
+OR
+```bash
 chmod +x start.sh
 ./start.sh
 ```
@@ -97,6 +121,8 @@ chmod +x start.sh
    - Backend Django: `http://localhost:8000`
 
 ## After installation run tests
+> [!TIP]
+> Doing tests allows for immediate validation and improvement of the code.
 1. **Run tests:**
 ```bash
 python3 tests.py
