@@ -136,11 +136,16 @@
           </button>
         </div>
 
+        <div *ngIf="!ahpData || ahpData.length === 0" class="tw-text-center tw-mt-10">
+          <p>
+            Loading AHP data...
+              <fa-icon
+              [icon]="faSpinner" [spin]="true" [pulse]="true"></fa-icon>
+          </p>
+        </div>
+
     </div>
 
   </div>
 </div>
 
-<div *ngIf="!ahpData" class="tw-text-center tw-mt-10">
-    <p>Loading AHP data...</p>
-</div>

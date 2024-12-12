@@ -136,11 +136,15 @@
 
           </div>
 
+          <div *ngIf="!topsisData || topsisData.length === 0" class="tw-text-center tw-mt-10">
+            <p>
+              Loading Topsis data...
+                <fa-icon
+                [icon]="faSpinner" [spin]="true" [pulse]="true"></fa-icon>
+            </p>
+          </div>
+
       </div>
           
     </div>
-</div>
-
-<div *ngIf="!topsisData" class="tw-text-center tw-mt-10">
-  <p>Loading Topsis data...</p>
 </div>

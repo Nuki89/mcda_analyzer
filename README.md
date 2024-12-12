@@ -23,15 +23,18 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 For exit virtual environment use `deactivate`
+
+For exit virtual environment use `deactivate`
 2. **Install Python Dependencies:**
 ```bash
-cd backend
 pip3 install -r requirements.txt
+```
+
+2. **Migration and Start backend server:**
+```bash
+cd backend
 python3 manage.py makemigrations
 python3 manage.py migrate
-```
-3. **Start backend server:** 
-```bash
 python3 manage.py runserver
 ```
 
@@ -49,20 +52,21 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 For exit virtual environment use `deactivate`
 2. **Install Python Dependencies:**
 ```bash
-cd backend
 pip install -r requirements.txt
+```
+
+3. **Migration and Start backend server:**
+```bash
 python manage.py makemigrations
 python manage.py migrate
-```
-3. **Start backend server:** 
-```bash
 python manage.py runserver
 ```
 
 ## Installation frontend (Angular)
-**Install Angular CLI:**
+**Install npm and Angular CLI:**
 ```bash
-npm install -g @angular/cli@18
+sudo apt install npm
+sudo npm install -g @angular/cli@18
 ```
 
 1. **Install Angular Dependencies:**
