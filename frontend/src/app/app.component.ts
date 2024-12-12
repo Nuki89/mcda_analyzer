@@ -6,11 +6,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DarkModeService } from './services/dark-mode.service';
 import { CommonModule } from '@angular/common';
+import { AgChartsModule } from 'ag-charts-angular';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule ,RouterOutlet, RouterModule, HttpClientModule, HeaderComponent, FooterComponent, FontAwesomeModule],
+  imports: [CommonModule ,RouterOutlet, RouterModule, HttpClientModule, HeaderComponent, FooterComponent, FontAwesomeModule, AgChartsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   encapsulation: ViewEncapsulation.None

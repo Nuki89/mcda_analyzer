@@ -28,6 +28,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
     "@fortawesome/free-regular-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "ag-charts-angular": "^11.0.0",
     "ag-grid-angular": "^32.3.2",
     "bootstrap": "^5.3.3",
     "express": "^4.18.2",
