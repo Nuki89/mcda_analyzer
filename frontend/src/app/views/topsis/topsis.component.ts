@@ -4,7 +4,7 @@ import { TopsisDataService } from '../../services/topsis-data.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faFloppyDisk, faRotateRight, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk, faRotateRight, faSpinner, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DarkModeService } from '../../services/dark-mode.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -26,6 +26,7 @@ interface Criterion {
 })
 export class TopsisComponent {
   // Fontawesome icons
+  faSpinner = faSpinner;
   faTriangleExclamation = faTriangleExclamation;
   faRotateRight = faRotateRight;
   faFloppyDisk = faFloppyDisk;
