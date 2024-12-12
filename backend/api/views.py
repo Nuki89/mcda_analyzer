@@ -29,6 +29,15 @@ class ApiRootView(APIView):
         })
 
  
+class CriteriaDBView(viewsets.ModelViewSet):
+    queryset = Criteria.objects.all()
+    serializer_class = CriteriaSerializer
+
+    def list(self, request, *args, **kwargs):
+        criteria = get_criteria_with_fallback_test()
+        return Response(criteria, status=status.HTTP_200_OK)
+
+
 class CriteriaWeightsView(ViewSet):
     def list(self, request):
         criteria = list(Criteria.objects.all().values('name', 'field', 'default_weight'))
@@ -39,13 +48,14 @@ class CriteriaWeightsView(ViewSet):
         return Response(criteria)
     
 
-class CriteriaDBView(viewsets.ModelViewSet):
-    queryset = Criteria.objects.all()
-    serializer_class = CriteriaSerializer
+class CachedFortuneDataView(viewsets.ModelViewSet):
+    queryset = Fortune500Entry.objects.all()
+    serializer_class = Fortune500EntrySerializer
 
-    def list(self, request, *args, **kwargs):
-        criteria = get_criteria_with_fallback_test()
-        return Response(criteria, status=status.HTTP_200_OK)
+    def get(self, request):
+        entries = Fortune500Entry.objects.all().order_by('rank')
+        serializer = Fortune500EntrySerializer(entries, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ScrapeFortuneDataView(APIView):
@@ -104,13 +114,13 @@ class ScrapeFortuneDataView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class CachedFortuneDataView(viewsets.ModelViewSet):
-    queryset = Fortune500Entry.objects.all()
-    serializer_class = Fortune500EntrySerializer
+class AHPResultViewSet(viewsets.ModelViewSet):
+    queryset = AHPResult.objects.all()
+    serializer_class = AHPResultSerializer
 
     def get(self, request):
-        entries = Fortune500Entry.objects.all().order_by('rank')
-        serializer = Fortune500EntrySerializer(entries, many=True)
+        entries = AHPResult.objects.all().order_by('rank')
+        serializer = AHPResultSerializer(entries, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -202,13 +212,13 @@ class AHPView(APIView):
         )
 
 
-class AHPResultViewSet(viewsets.ModelViewSet):
-    queryset = AHPResult.objects.all()
-    serializer_class = AHPResultSerializer
+class TopsisResultViewSet(viewsets.ModelViewSet):
+    queryset = TopsisResult.objects.all()
+    serializer_class = TopsisResultSerializer
 
     def get(self, request):
-        entries = AHPResult.objects.all().order_by('rank')
-        serializer = AHPResultSerializer(entries, many=True)
+        entries = TopsisResult.objects.all().order_by('rank')
+        serializer = TopsisResultSerializer(entries, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -291,16 +301,6 @@ class TOPSISView(APIView):
             rankings=rankings,
             timestamp=now() 
         )
-
-
-class TopsisResultViewSet(viewsets.ModelViewSet):
-    queryset = TopsisResult.objects.all()
-    serializer_class = TopsisResultSerializer
-
-    def get(self, request):
-        entries = TopsisResult.objects.all().order_by('rank')
-        serializer = TopsisResultSerializer(entries, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class PrometheeResultViewSet(viewsets.ModelViewSet):
