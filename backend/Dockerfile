@@ -5,4 +5,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . . 
 ENV PYTHONNUNBUFFERED 1
 EXPOSE 8000
+
+COPY backend.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/backend.sh
+
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
