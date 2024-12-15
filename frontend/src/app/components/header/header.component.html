@@ -48,6 +48,8 @@
         (click)="onScrape()">
         <fa-icon 
         [icon]="faSnowflake"
+        [spin]="isSpinning"
+        [ngClass]="{'tw-text-red-400': isSpinning}"
         class="tw-mr-2">
         </fa-icon>  
       </button>
@@ -77,3 +79,16 @@
 
   </div>
 </nav>
+
+
+<div *ngIf="isSpinning" class="overlay">
+  <div class="overlay-content">
+      <p>
+        <fa-icon 
+          [icon]="faSpinner" 
+          [spin]="true" 
+          [pulse]="true">
+        </fa-icon>
+      </p>
+  </div>
+</div>

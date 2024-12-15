@@ -2,13 +2,15 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DarkModeComponent } from '../dark-mode/dark-mode.component';
 import { RouterModule } from '@angular/router';
-import { faSnowflake } from '@fortawesome/free-solid-svg-icons';
+import { faSnowflake, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { ScrapeService } from '../../services/scrape.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterModule ,FontAwesomeModule, DarkModeComponent],
+  imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule, DarkModeComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
   encapsulation: ViewEncapsulation.None
@@ -16,7 +18,8 @@ import { ScrapeService } from '../../services/scrape.service';
 export class HeaderComponent {
   // FONTAWESOME ICONS
   faSnowflake = faSnowflake;
-  
+  isSpinning = false;
+  faSpinner = faSpinner;
   isMenuOpen = false;
 
   toggleMenu() {
@@ -29,6 +32,7 @@ export class HeaderComponent {
   constructor(private scrapeService: ScrapeService) {}
 
   onScrape(): void {
+    this.isSpinning = !this.isSpinning;
     this.isScraping = true;
     this.scrapeService.scrapeData().subscribe({
       next: (response) => {
