@@ -8,8 +8,11 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    environment:
+      - SELENIUM_ENV=docker
     depends_on:
       - db
+      - selenium
 
   frontend:
     build:
@@ -32,6 +35,13 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  selenium:
+    image: seleniarm/standalone-chromium
+    container_name: mcda-selenium
+    ports:
+      - "4444:4444"
+    shm_size: 1gb 
 
 volumes:
   postgres_data:

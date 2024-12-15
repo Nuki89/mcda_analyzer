@@ -7,6 +7,7 @@ from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
+
 def get_criteria_with_fallback():
     """
     Fetches criteria from the database. If there is no criteria in the database, falls back to a hardcoded default list.
@@ -26,6 +27,7 @@ def get_criteria_with_fallback():
     else:
         logger.info(f"Fetched {len(criteria)} criteria from the database.")
     return criteria
+
 
 def get_criteria_with_fallback_test():
     """
@@ -121,7 +123,6 @@ def process_weights(weights_param, default_weights, num_criteria):
     return weights
 
 
-# AHP-Specific Function
 def calculate_ahp(data, weights, company_names, criteria_names):
     """
     Calculate AHP scores for companies.
@@ -146,7 +147,6 @@ def calculate_ahp(data, weights, company_names, criteria_names):
     return company_scores
 
 
-# TOPSIS-Specific Function
 def calculate_topsis(data, weights, company_names, criteria_names):
     """
     Calculate TOPSIS scores for companies.
@@ -220,8 +220,6 @@ def perform_topsis_calculation(criteria_url, selected_criteria, weights_param, c
     return result
 
 
-
-# PROMETHEE-Specific Function
 def calculate_promethee(data, weights, company_names, criteria_directions, scale_net_flows=False):
     """
     Calculate PROMETHEE rankings for companies with optional scaling.
@@ -338,20 +336,27 @@ def calculate_wsm(data, weights, alternative_names, criteria_names):
     return alternative_scores
 
 
-def perform_wsm_calculation(criteria_url, selected_criteria, weights, company_queryset):
+def perform_wsm_calculation(criteria_url, selected_criteria_param, weights_param, company_queryset):
     criteria = fetch_criteria(criteria_url)
-    criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria)
+    criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)
 
     if not company_queryset.exists():
         raise ValueError("No data found. Please scrape data first.")
+    
+    if weights_param:
+        weights = np.array(list(map(float, weights_param.split(','))))
+        if len(weights) != len(criteria):
+            raise ValidationError("The number of weights must match the number of selected criteria.")
+    else:
+        weights = default_weights  
+    alternative_names = [entry.name for entry in company_queryset]
 
-    weights = list(map(float, weights))
     data_matrix = np.array([
         [getattr(entry, c['field'], 0) or 0 for c in criteria]
         for entry in company_queryset
     ], dtype=float)
 
-    scores = calculate_wsm(data_matrix, weights, [entry.name for entry in company_queryset], criteria_names)
+    scores = calculate_wsm(data_matrix, weights, alternative_names, criteria_names)
 
     result = {
         "criteria_with_weights": [{"name": name, "weight": weight} for name, weight in zip(criteria_names, weights)],
