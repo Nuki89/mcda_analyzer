@@ -1,24 +1,45 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import json
+import os
 
-def scrape_fortune_rows_hybrid(url, num_rows=20):
-    # Set up Selenium options for headless mode
+SELENIUM_GRID_URL = "http://selenium:4444/wd/hub"
+
+
+def get_driver():
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
-    # Initialize the Selenium WebDriver
-    driver = webdriver.Chrome(service=ChromeService(
-        ChromeDriverManager().install()), options=options)
+    if os.getenv('SELENIUM_ENV') == 'docker':
+        print("Using remote Selenium server at {}".format(SELENIUM_GRID_URL))
+        return webdriver.Remote(command_executor=SELENIUM_GRID_URL, options=options)
+    else:
+        print("Using local WebDriver")
+        return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+
+
+def remove_overlay(driver, selector):
+    try:
+        overlay = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+        )
+        driver.execute_script("arguments[0].remove();", overlay)
+        print(f"Removed overlay: {selector}")
+    except:
+        print(f"No overlay found with selector: {selector}")
+
+
+def scrape_fortune_rows_hybrid(url, num_rows=20):
+    driver = get_driver()
     driver.get(url)
 
     try:
@@ -33,13 +54,15 @@ def scrape_fortune_rows_hybrid(url, num_rows=20):
         except:
             print("No cookie consent banner found or already dismissed.")
 
+        # Remove any potential overlay
+        remove_overlay(driver, "div#voltax-mp-video")
+
         # Open the industry dropdown menu
         print("Opening the industry dropdown...")
         industry_dropdown_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-cy='industry-ddl-button']"))
         )
         driver.execute_script("arguments[0].click();", industry_dropdown_button)
-        time.sleep(1)  # Wait briefly for dropdown to expand
 
         # Select "Mining, Crude-Oil Production" from the dropdown
         print("Selecting 'Mining, Crude-Oil Production' option...")
@@ -54,9 +77,8 @@ def scrape_fortune_rows_hybrid(url, num_rows=20):
         dropdown_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-cy='filter-rows-to-show-button']"))
         )
-        dropdown_button.click()
+        driver.execute_script("arguments[0].click();", dropdown_button)
         
-        # Select "20 Rows" option
         twenty_rows_option = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//li[@role='option' and contains(., '20 Rows')]"))
         )
@@ -65,7 +87,9 @@ def scrape_fortune_rows_hybrid(url, num_rows=20):
         
         # Wait for rows to load
         print("Waiting for rows to load...")
-        time.sleep(2)  # Wait briefly to ensure the rows load completely
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "tr[data-cy='list-row']"))
+        )
 
         # Get the HTML page source and parse with BeautifulSoup
         soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -88,11 +112,6 @@ def scrape_fortune_rows_hybrid(url, num_rows=20):
         json_data = json.dumps(all_data, indent=4)
         print("Data in JSON format:")
         print(json_data)
-
-        # Optionally, save to a JSON file
-        # with open("test_fortune_500_data.json", "w") as json_file:
-        #     json_file.write(json_data)
-        #     print("Data saved to 'test_fortune_500_data.json'")
         
         return all_data
 
@@ -101,6 +120,3 @@ def scrape_fortune_rows_hybrid(url, num_rows=20):
         return []
     finally:
         driver.quit()
-
-# Example usage
-# scraped_data = scrape_fortune_rows_hybrid("https://fortune.com/ranking/global500/search/", num_rows=20)
