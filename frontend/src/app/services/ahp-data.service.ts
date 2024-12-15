@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class AhpDataService {
   private apiUrl = 'http://127.0.0.1:8000/ahp-results/';
-  private calculationUrl = 'http://172.0.0.1:8000/ahp/';
+  private calculationUrl = 'http://127.0.0.1:8000/ahp/';
 
   constructor(private http: HttpClient) { }
 
