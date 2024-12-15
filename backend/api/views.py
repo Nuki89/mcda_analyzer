@@ -428,12 +428,12 @@ class WSMView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
     def post(self, request, *args, **kwargs):
         try:
             data = request.data
-            selected_criteria = data.get('selected_criteria', [])
-            weights = data.get('weights', [])
+            selected_criteria = data.get('selected_criteria', '')
+            weights = data.get('weights', '')
 
             if not selected_criteria or not weights:
                 return Response({"error": "Selected criteria and weights are required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -441,8 +441,14 @@ class WSMView(APIView):
             criteria_url = 'http://127.0.0.1:8000/criteria/'
             company_queryset = Fortune500Entry.objects.order_by('last_scraped')[:20]
 
+            if not company_queryset.exists():
+                return Response({"error": "No data found. Please scrape data first."}, status=status.HTTP_404_NOT_FOUND)
+
+            selected_criteria_str = ','.join(selected_criteria)
+            weights_str = ','.join(map(str, weights)) 
+
             result = perform_wsm_calculation(
-                criteria_url, ','.join(selected_criteria), weights, company_queryset
+                criteria_url, selected_criteria_str, weights_str, company_queryset
             )
 
             self.save_wsm_result(result)
