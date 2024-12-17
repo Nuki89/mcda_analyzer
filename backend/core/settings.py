@@ -134,5 +134,6 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",  # Angular default port
+    "http://localhost:4200",
+    "http://172.179.236.116:4200"
 ]

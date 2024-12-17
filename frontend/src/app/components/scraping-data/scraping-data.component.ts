@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, PLATFORM_ID, Inject, ViewChild, HostListener } from '@angular/core';
+import { Component, AfterViewInit, PLATFORM_ID, Inject, ViewChild, HostListener, Output, EventEmitter } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AgGridAngular } from 'ag-grid-angular'; 
 import { ColDef, GridOptions } from 'ag-grid-community';
@@ -99,6 +99,12 @@ export class ScrapingDataComponent implements AfterViewInit {
     this.scrapingDataService.getScrapingData().subscribe(
       (data: any[]) => {
         this.rowData = data;
+        if (data.length > 0)
+          this.scrapingDataService.sendData(data);
+        else {
+          console.log('No data found');
+        }
+        // console.log('Scraping data:', data);
       },
       (error: any) => {
         console.error('Error fetching scraping data:', error);

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -13,4 +13,5 @@ export class ScrapeService {
   scrapeData(): Observable<any> {
     return this.http.get(this.scrapeUrl);
   }
+  
 }
