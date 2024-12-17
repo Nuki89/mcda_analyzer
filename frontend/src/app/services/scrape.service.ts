@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ScrapeService {
-  private scrapeUrl = 'http://localhost:8000/scrape/';
+  private scrapeUrl = 'http://127.0.0.1:8000/scrape/';
 
   constructor(private http: HttpClient) {}
 
