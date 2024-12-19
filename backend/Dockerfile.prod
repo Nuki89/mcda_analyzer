@@ -9,7 +9,7 @@ COPY . .
 ENV PYTHONUNBUFFERED 1
 EXPOSE 8000
 
-COPY backend.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/backend.sh
+COPY backend_prod.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/backend_prod.sh
 
 CMD ["/usr/local/bin/backend_prod.sh"]
