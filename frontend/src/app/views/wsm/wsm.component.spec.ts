@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WsmComponent } from './wsm.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('WsmComponent', () => {
   let component: WsmComponent;
@@ -8,7 +9,7 @@ describe('WsmComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WsmComponent]
+      imports: [WsmComponent, BrowserAnimationsModule]
     })
     .compileComponents();
     

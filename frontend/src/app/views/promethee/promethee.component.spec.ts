@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PrometheeComponent } from './promethee.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('PrometheeComponent', () => {
   let component: PrometheeComponent;
@@ -8,7 +9,7 @@ describe('PrometheeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PrometheeComponent]
+      imports: [PrometheeComponent, BrowserAnimationsModule]
     })
     .compileComponents();
     
