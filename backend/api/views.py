@@ -127,6 +127,10 @@ class AHPResultViewSet(viewsets.ModelViewSet):
 class AHPView(APIView):
     def get(self, request, *args, **kwargs):
         try:
+            # if PYTHON_DEBUG == True:
+            #     criteria = fetch_criteria('http://127.0.0.1:8000/default-criteria/')
+            # else:
+            #     criteria = fetch_criteria('http://172.179.236.116:8000/default-criteria/')
             criteria = fetch_criteria('http://127.0.0.1:8000/default-criteria/')
             selected_criteria_param = request.query_params.get('selected_criteria', None)
             criteria, criteria_names, default_weights = process_criteria(criteria, selected_criteria_param)

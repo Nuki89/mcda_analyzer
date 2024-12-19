@@ -24,11 +24,12 @@ BASE_PATH = os.getenv('BASE_PATH','')
 SECRET_KEY = 'django-insecure-y*42b2yv(7^y_r7%@3kbsf0(sao^02(^qz0!x6jnw0)p#=m%!7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = eval(os.environ.get('PYTHON_DEBUG',"False"))
 
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-ALLOWED_HOSTS = ['*']
 
+ALLOWED_HOSTS = ['172.179.236.116', '127.0.0.1', 'localhost']
+# ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -137,3 +138,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
     "http://172.179.236.116:4200"
 ]
+
+BACKEND_API_URL = os.environ.get("BACKEND_API_URL")
