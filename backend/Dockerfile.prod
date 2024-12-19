@@ -12,4 +12,4 @@ EXPOSE 8000
 COPY backend.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/backend.sh
 
-CMD ["/usr/local/bin/backend.sh"]
+CMD ["/usr/local/bin/backend_prod.sh"]
