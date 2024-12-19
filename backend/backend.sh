@@ -1,5 +1,6 @@
 #!/bin/bash
 # Navigate to the app directory
+echo "BACKEND_API_URL: $BACKEND_API_URL"
 cd /app
 
 # Apply database migrations
