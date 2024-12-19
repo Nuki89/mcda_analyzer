@@ -18,6 +18,7 @@ COPY package*.json ./
 RUN npm install -g @angular/cli@18
 RUN rm -rf node_modules/
 RUN npm install
+RUN npm install --save-dev @types/jasmine
 COPY . .
 RUN ng build --configuration=production
 
