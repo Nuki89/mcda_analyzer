@@ -2,6 +2,7 @@ const BASE_URL = `http://172.179.236.116:8000`;
 
 export const environment = {
   production: false,
+  apiUrlDefaultCriteria: `${BASE_URL}/default-criteria/`,
   scrapeUrl: `${BASE_URL}/scrape/`,
   apiUrl: `${BASE_URL}/scraped-data/`,
   apiUrlAHP: `${BASE_URL}/ahp-results/`,
