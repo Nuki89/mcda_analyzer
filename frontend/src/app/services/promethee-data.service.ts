@@ -8,8 +8,9 @@ import { environment } from '../../environments/environment';
 })
 export class PrometheeDataService {
   private apiUrlPromethee = environment.apiUrlPromethee;
+  private calculationUrl = environment.apiUrlPrometheeCalculation;
   // private apiUrl = 'http://127.0.0.1:8000/promethee-results/';
-  private calculationUrl = 'http://127.0.0.1:8000/promethee/';
+  // private calculationUrl = 'http://127.0.0.1:8000/promethee/';
 
   constructor(private http: HttpClient) { }
 

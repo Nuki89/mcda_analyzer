@@ -8,8 +8,9 @@ import { environment } from '../../environments/environment';
 })
 export class WsmDataService {
   private apiUrlWsm = environment.apiUrlWsm;
+  private calculationUrl = environment.apiUrlWsmCalculation;
   // private apiUrl = 'http://127.0.0.1:8000/wsm-results/';
-  private calculationUrl = 'http://127.0.0.1:8000/wsm/';
+  // private calculationUrl = 'http://127.0.0.1:8000/wsm/';
 
   constructor(private http: HttpClient) { }
 
