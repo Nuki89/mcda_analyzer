@@ -1,6 +1,6 @@
 const BASE_URL = `http://172.179.236.116:8000`;
 
-export const environment = {
+export const apiEndpoints = {
   production: false,
   apiUrlDefaultCriteria: `${BASE_URL}/default-criteria/`,
   scrapeUrl: `${BASE_URL}/scrape/`,
