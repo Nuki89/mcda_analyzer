@@ -67,11 +67,11 @@ export class MainDashboardComponent {
         console.log('AHP data:', this.ahpData);
         this.processRankings(this.ahpData, 'AHP');
 
-        // if (this.ahpData < 1) {
-        //   this.ahpDataService.triggerAHPCalculation().subscribe((data: any[]) => {
-        //   console.log('Ahp data was empty');
-        //   });
-        // }
+        if (this.ahpData < 1) {
+          this.ahpDataService.triggerAHPCalculation().subscribe((data: any[]) => {
+          console.log('Ahp data was empty');
+          });
+        }
         
       },
       (error: any) => {
@@ -85,11 +85,11 @@ export class MainDashboardComponent {
         console.log('Topsis data:', this.topsisData);
         this.processRankings(this.topsisData, 'Topsis');
 
-        // if (this.topsisData < 1) {
-        //   this.topsisDataService.triggerTopsisCalculation().subscribe((data: any[]) => {
-        //   console.log('Topsis data was empty');
-        //   });
-        // }
+        if (this.topsisData < 1) {
+          this.topsisDataService.triggerTopsisCalculation().subscribe((data: any[]) => {
+          console.log('Topsis data was empty');
+          });
+        }
 
       },
       (error: any) => {
@@ -103,11 +103,11 @@ export class MainDashboardComponent {
         console.log('Promethee data:', this.prometheeData);
         this.processRankings(this.prometheeData, 'Promethee');
 
-        // if (this.prometheeData < 1) {
-        //   this.prometheeDataService.triggerPrometheeCalculation().subscribe((data: any[]) => {
-        //   console.log('Promethee data was empty');
-        //   });
-        // }
+        if (this.prometheeData < 1) {
+          this.prometheeDataService.triggerPrometheeCalculation().subscribe((data: any[]) => {
+          console.log('Promethee data was empty');
+          });
+        }
 
       },
       (error: any) => {
@@ -121,11 +121,11 @@ export class MainDashboardComponent {
         console.log('WSM data:', this.wsmData);
         this.processRankings(this.wsmData, 'WSM');
 
-        // if (this.wsmData < 1) {
-        //   this.wsmDataService.triggerWSmCalculation().subscribe((data: any[]) => {
-        //   console.log('WSM data was empty');
-        //   });
-        // }
+        if (this.wsmData < 1) {
+          this.wsmDataService.triggerWSmCalculation().subscribe((data: any[]) => {
+          console.log('WSM data was empty');
+          });
+        }
 
       },
       (error: any) => {
