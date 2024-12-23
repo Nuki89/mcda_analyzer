@@ -9,6 +9,7 @@ import { DarkModeService } from '../../services/dark-mode.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { apiEndpoints } from '../../../environments/environment';
 
 interface Criterion {
   name: string;
@@ -179,7 +180,7 @@ export class WsmComponent {
     console.log('Payload:', payload);
 
     this.http
-        .post('http://127.0.0.1:8000/wsm/', payload)
+        .post(apiEndpoints.apiUrlPrometheeCalculation, payload)
         .subscribe(
             (data: any) => {
                 this.wsmData = data;
@@ -216,7 +217,7 @@ export class WsmComponent {
   }
 
   resetToDefaultWeights() {
-    this.http.get<Criterion[]>('http://127.0.0.1:8000/default-criteria/')
+    this.http.get<Criterion[]>(apiEndpoints.apiUrlDefaultCriteria)
         .subscribe(
             (defaultWeights) => {
                 if (!Array.isArray(defaultWeights)) {
