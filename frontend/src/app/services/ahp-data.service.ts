@@ -8,8 +8,9 @@ import { environment } from '../../environments/environment';
 })
 export class AhpDataService {
   private apiUrlAHP = environment.apiUrlAHP;
+  private calculationUrl = environment.apiUrlAHPcalculation;
   // private apiUrlAHP = 'http://127.0.0.1:8000/ahp-results/';
-  private calculationUrl = 'http://127.0.0.1:8000/ahp/';
+  // private calculationUrl = 'http://127.0.0.1:8000/ahp/';
 
   constructor(private http: HttpClient) { }
 

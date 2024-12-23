@@ -16,7 +16,8 @@ export const environment = {
   scrapeUrl: `${BASE_URL}/scrape/`,
   apiUrl: `${BASE_URL}/scraped-data/`,
   apiUrlAHP: `${BASE_URL}/ahp-results/`,
-  apiUrlPromethee: `${BASE_URL}/promethee-results/`,
+  apiUrlAHPcalculation: `${BASE_URL}/ahp/`,
   apiUrlTopsis: `${BASE_URL}/topsis-results/`,
+  apiUrlPromethee: `${BASE_URL}/promethee-results/`,
   apiUrlWsm: `${BASE_URL}/wsm-results/`
 };
