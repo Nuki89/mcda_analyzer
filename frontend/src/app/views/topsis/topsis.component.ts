@@ -9,6 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DarkModeService } from '../../services/dark-mode.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
+import { environment } from '../../../environments/environment';
 
 interface Criterion {
   name: string;
@@ -105,7 +106,8 @@ export class TopsisComponent {
 
 
   resetToDefaultWeights() {
-    this.http.get<Criterion[]>('http://127.0.0.1:8000/default-criteria/')
+    this.http.get<Criterion[]>(environment.apiUrlDefaultCriteria)
+    // this.http.get<Criterion[]>('http://127.0.0.1:8000/default-criteria/')
         .subscribe(
             (defaultWeights) => {
                 if (!Array.isArray(defaultWeights)) {
@@ -208,7 +210,8 @@ export class TopsisComponent {
 
 
     this.http
-      .post('http://127.0.0.1:8000/topsis/', payload)
+    .post(environment.apiUrlTopsisCalculation, payload)
+    // .post('http://127.0.0.1:8000/topsis/', payload)
       .subscribe(
         (data: any) => {
           console.log('Backend Response:', data);
