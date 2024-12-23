@@ -14,6 +14,8 @@ services:
     depends_on:
       - db
       - selenium
+    networks:
+      - mcda-network
 
   frontend:
     build:
@@ -24,6 +26,8 @@ services:
       - "4200:4200"
     depends_on:
       - backend
+    networks:
+      - mcda-network
 
   db:
     image: postgres:13
@@ -36,6 +40,8 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mcda-network
 
   selenium:
     image: seleniarm/standalone-chromium
@@ -43,6 +49,12 @@ services:
     ports:
       - "4444:4444"
     shm_size: 1gb 
+    networks:
+      - mcda-network
 
 volumes:
   postgres_data:
+
+networks:
+  mcda-network:
+    driver: bridge

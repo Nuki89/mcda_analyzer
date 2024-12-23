@@ -24,8 +24,8 @@ BASE_PATH = os.getenv('BASE_PATH','')
 SECRET_KEY = 'django-insecure-y*42b2yv(7^y_r7%@3kbsf0(sao^02(^qz0!x6jnw0)p#=m%!7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = eval(os.environ.get('PYTHON_DEBUG',"False"))
+DEBUG = True
+# DEBUG = eval(os.environ.get('PYTHON_DEBUG',"False"))
 
 
 # ALLOWED_HOSTS = ['172.179.236.116', '127.0.0.1', 'localhost']
