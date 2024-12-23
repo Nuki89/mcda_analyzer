@@ -10,8 +10,8 @@ import { environment } from '../../environments/environment';
 })
 export class ScrapingDataService {
   // private apiUrl = 'http://127.0.0.1:8000/scraped-data/';
-  // private apiUrl = 'http://172.179.236.116:8000/scraped-data/';
-  private apiUrl = environment.apiUrl;
+  private apiUrl = 'http://172.179.236.116:8000/scraped-data/';
+  // private apiUrl = environment.apiUrl;
   private dataSubject = new BehaviorSubject<any[]>([]);
 
   constructor(private http: HttpClient) {}
