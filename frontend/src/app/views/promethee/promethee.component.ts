@@ -9,6 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { faCalculator, faFloppyDisk, faRotateRight, faSpinner, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { apiEndpoints } from '../../../environments/environment';
 
 interface Criterion {
   name: string;
@@ -105,7 +106,7 @@ export class PrometheeComponent {
 
 
   resetToDefaultWeights() {
-    this.http.get<Criterion[]>('http://127.0.0.1:8000/default-criteria/')
+    this.http.get<Criterion[]>(apiEndpoints.apiUrlDefaultCriteria)
         .subscribe(
             (defaultWeights) => {
                 if (!Array.isArray(defaultWeights)) {
@@ -209,7 +210,7 @@ export class PrometheeComponent {
 
   
     this.http
-        .post('http://127.0.0.1:8000/promethee/', payload)
+        .post(apiEndpoints.apiUrlPrometheeCalculation, payload)
         .subscribe(
             (data: any) => {
                 console.log('Backend Response:', data);
