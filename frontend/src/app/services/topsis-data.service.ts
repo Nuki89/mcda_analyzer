@@ -8,8 +8,9 @@ import { environment } from '../../environments/environment';
 })
 export class TopsisDataService {
   private apiUrlTopsis = environment.apiUrlTopsis;
+  private calculationUrl = environment.apiUrlTopsisCalculation;
   // private apiUrl = 'http://127.0.0.1:8000/topsis-results/';
-  private calculationUrl = 'http://127.0.0.1:8000/topsis/';
+  // private calculationUrl = 'http://127.0.0.1:8000/topsis/';
 
   constructor(private http: HttpClient) { }
 
