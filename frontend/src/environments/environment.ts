@@ -1,4 +1,5 @@
-const BASE_URL = `http://172.179.236.116:8000`;
+// const BASE_URL = `http://172.179.236.116:8000`;
+const BASE_URL = `http://0.0.0.0:8000`;
 
 export const apiEndpoints = {
   production: false,
