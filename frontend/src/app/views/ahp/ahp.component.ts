@@ -10,6 +10,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faFloppyDisk, faRotateRight, faSpinner, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { apiEndpoints } from '../../../environments/environment';
+import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
 
 interface Criterion {
     name: string;
@@ -20,7 +21,7 @@ interface Criterion {
 @Component({
     selector: 'app-ahp',
     standalone: true,
-    imports: [CommonModule, HttpClientModule, FormsModule, MatCheckboxModule, MatSelectModule, FontAwesomeModule, MatSlideToggleModule],
+    imports: [CommonModule, HttpClientModule, FormsModule, MatCheckboxModule, MatSelectModule, FontAwesomeModule, MatSlideToggleModule, BarChartComponent],
     templateUrl: './ahp.component.html',
     styleUrls: ['./ahp.component.css'],
 })
@@ -32,7 +33,7 @@ export class AhpComponent  {
     faFloppyDisk = faFloppyDisk; 
     faRotateRight = faRotateRight;
 
-    title = "AHP";
+    title = "Analytic Hierarchy Process (AHP)";
     ahpData: any = {};
     selectedTopCount: number = 3; 
     topOptions: number[] = [3, 5, 10];

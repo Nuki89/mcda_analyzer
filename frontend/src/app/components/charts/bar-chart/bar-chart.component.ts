@@ -6,9 +6,9 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 @Component({
   selector: 'app-bar-chart',
   standalone: true,
-  template: '<div #chartdiv id="chartdiv" style="width: 100%; height: 500px;"></div>',
+  template: '<div #chartdiv id="chartdiv" style="width: 100%; height: 550px; "></div>',
   styles: [`
-    #chartdiv { width: 100%; height: 500px; }
+    #chartdiv { width: 100%; height: 600px; }
   `]
 })
 export class BarChartComponent implements AfterViewInit, OnDestroy, OnChanges {
