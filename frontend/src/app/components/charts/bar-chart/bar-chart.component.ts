@@ -14,6 +14,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 export class BarChartComponent implements AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('chartdiv', { static: true }) chartDiv!: ElementRef;
   @Input() chartData: any[] = [];
+  @Input() yField: string = 'score';
 
   private root!: am5.Root;
   private chart!: am5xy.XYChart;
@@ -61,7 +62,7 @@ export class BarChartComponent implements AfterViewInit, OnDestroy, OnChanges {
       name: "Series 1",
       xAxis: xAxis,
       yAxis: yAxis,
-      valueYField: "score",  
+      valueYField: this.yField,
       categoryXField: "name"  
     }));
 
