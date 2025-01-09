@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div class="tw-mt-4 tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+        <!-- <div class="tw-mt-4 tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
             <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights
             </h2>
             
@@ -145,6 +145,126 @@
               </p>
             </div>
 
+        </div> -->
+
+        <div class="tw-flex tw-flex-col lg:tw-flex-row">
+
+          <div class="tw-flex-1 tw-mr-2">
+            <div class="tw-mt-4 tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+              <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Criteria and Weights
+              </h2>
+              
+              <table class="tw-w-full tw-text-left tw-mt-4 tw-border-white/30">
+                <thead>
+                  <tr class="tw-border-b ">
+                    <th class="tw-py-2 tw-px-4">Status</th>
+                    <th class="tw-py-2 tw-px-4">Criterion</th>
+                    <th class="tw-py-2 tw-px-4">Weight</th>
+                    <th class="tw-py-2 tw-px-4">Adjust Weight</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let criterion of criteriaWithWeights; let i = index" class="tw-border-b">
+                    <td class="tw-py-2 tw-px-4">
+                      <mat-slide-toggle
+                      [(ngModel)]="criteriaWithWeights[i].active"
+                      (change)="onToggleChange()"
+                      [ngClass]="{
+                        'toggle-active': criteriaWithWeights[i].active,
+                        'toggle-inactive': !criteriaWithWeights[i].active
+                      }">
+                    </mat-slide-toggle>
+                    </td>
+                    <td 
+                      class="tw-py-2 tw-px-4" 
+                      >
+                      {{ criterion.name }}
+                    </td> 
+                    <td class="tw-py-2 tw-px-4">{{ criterion.weight | number:'1.2-2' }}</td>
+                    <td class="tw-py-2 tw-px-4">
+      
+                      <mat-form-field appearance="outline" class="tw-w-20 custom-border-height">
+                        <mat-select
+                          [(ngModel)]="criteriaWithWeights[i].weight"
+                          [disabled]="!criterion.active"
+                          [ngClass]="{
+                            'tw-bg-gray-200 cursor-not-allowed': !criterion.active,
+                            'tw-cursor-pointer': criterion.active
+                          }"
+                          class="tw-text-sm"
+                          (selectionChange)="updateWeight(i, criteriaWithWeights[i].weight)">
+                          <mat-option *ngFor="let weight of weightOptions" [value]="weight">
+                            {{ weight }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          
+              <div class="tw-flex tw-justify-end tw-mt-4 tw-items-center" *ngIf="criteriaWithWeights?.length && criteriaWithWeights.length > 0">
+                <div class="tw-text-right tw-cursor-default">
+                  <p class="tw-mr-4 tw-font-bold " [ngStyle]="{'color': weightSum === 1 ? 'green' : 'red'}">
+                    Sum of Weights: {{ weightSum | number:'1.2-2' }}
+                  </p>
+                  <p
+                    *ngIf="weightSum !== 1"
+                    class="tw-mr-2 tw-text-sm tw-text-red-500 tw-mt-1 tw-text-right">
+                    <fa-icon [icon]="faTriangleExclamation" class="tw-text-yellow-300"></fa-icon>
+                    The sum of weights must be 1
+                    <fa-icon [icon]="faTriangleExclamation" class="tw-text-yellow-300"></fa-icon>
+                  </p>
+                </div>
+                <button
+                  [disabled]="weightSum !== 1"
+                  [ngClass]="{
+                    'tw-bg-violet-800 tw-text-white hover:tw-bg-violet-900': weightSum === 1,
+                    'tw-bg-violet-400 tw-text-black cursor-not-allowed': weightSum !== 1
+                  }"
+                  class="tw-text-white tw-px-4 tw-py-2 tw-rounded"
+                  (click)="saveWeights()">
+                  Save   
+                  <fa-icon 
+                    [icon]="faFloppyDisk" 
+                    [ngClass]="{
+                      'tw-text-white ': weightSum === 1,
+                      'tw-text-black cursor-not-allowed': weightSum !== 1
+                    }">
+                  </fa-icon>
+                </button>
+                
+                <button 
+                  class="tw-ml-2 tw-text-white tw-px-4 tw-py-2 tw-rounded tw-bg-red-700 hover:tw-bg-red-600" 
+                  (click)="resetToDefaultWeights()">
+                  Reset 
+                  <fa-icon 
+                    [icon]="faRotateRight" 
+                    class="tw-ml-1 tw-text-white">
+                  </fa-icon>
+                </button>
+  
+              </div>
+      
+              <div *ngIf="!prometheeData || prometheeData.length === 0" class="tw-text-center tw-mt-10">
+                <p>
+                  Loading Promethee data...
+                    <fa-icon
+                    [icon]="faSpinner" [spin]="true" [pulse]="true"></fa-icon>
+                </p>
+              </div>
+  
+            </div>
+          </div>
+      
+          <div class="tw-flex-1 tw-ml-2">
+            <div class="tw-mt-4 tw-bg-white/20 tw-backdrop-blur-md tw-rounded-lg tw-shadow-lg tw-p-4 tw-border tw-border-white/10">
+              <h2 class="tw-text-lg tw-border-b tw-pb-2 tw-font-semibold">Top {{ selectedTopCount }} Companies</h2>
+              <app-bar-chart [chartData]="topThreeCompanies" [yField]="yFieldName"></app-bar-chart>
+            </div>
+          </div>
+    
         </div>
 
     </div>
