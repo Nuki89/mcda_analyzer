@@ -10,6 +10,7 @@ import { DarkModeService } from '../../services/dark-mode.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { apiEndpoints } from '../../../environments/environment';
+import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
 
 interface Criterion {
   name: string;
@@ -20,7 +21,7 @@ interface Criterion {
 @Component({
   selector: 'app-topsis',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, FontAwesomeModule, MatSlideToggleModule, MatCheckboxModule, MatSelectModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, FontAwesomeModule, MatSlideToggleModule, MatCheckboxModule, MatSelectModule, BarChartComponent],
   templateUrl: './topsis.component.html',
   styleUrl: './topsis.component.css',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -32,7 +33,7 @@ export class TopsisComponent {
   faRotateRight = faRotateRight;
   faFloppyDisk = faFloppyDisk;
 
-  title = "Topsis";
+  title = "Technique for Order of Preference by Similarity to Ideal Solution (TOPSIS)";
   topsisData: any = {};
   selectedTopCount: number = 3; 
   showScores: boolean = false;
@@ -44,6 +45,7 @@ export class TopsisComponent {
   isDarkMode = false;
   isCalculating = false;
   message: string | null = null;
+  yFieldName: string = 'closeness_coefficient';
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
