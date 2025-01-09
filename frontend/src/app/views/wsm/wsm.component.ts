@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { apiEndpoints } from '../../../environments/environment';
+import { BarChartComponent } from '../../components/charts/bar-chart/bar-chart.component';
 
 interface Criterion {
   name: string;
@@ -20,7 +21,7 @@ interface Criterion {
 @Component({
   selector: 'app-wsm',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, MatCheckboxModule, MatSelectModule, FontAwesomeModule, MatSlideToggleModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, MatCheckboxModule, MatSelectModule, FontAwesomeModule, MatSlideToggleModule, BarChartComponent],
   templateUrl: './wsm.component.html',
   styleUrl: './wsm.component.css'
 })
@@ -31,7 +32,8 @@ export class WsmComponent {
   faFloppyDisk = faFloppyDisk; 
   faRotateRight = faRotateRight;
 
-  title = "WSM";
+  // title = "WSM";
+  title = "Weighted Sum Model (WSM)";
   wsmData: any = {};
   selectedTopCount: number = 3; 
   topOptions: number[] = [3, 5, 10];
@@ -42,6 +44,7 @@ export class WsmComponent {
   weightOptions: number[] = Array.from({ length: 11 }, (_, i) => i / 10);
   isCalculating = false;
   message: string | null = null;
+  yFieldName: string = 'score';
 
   constructor(
     @Inject(HttpClient) private http: HttpClient,
