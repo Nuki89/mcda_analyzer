@@ -32,7 +32,6 @@ export class WsmComponent {
   faFloppyDisk = faFloppyDisk; 
   faRotateRight = faRotateRight;
 
-  // title = "WSM";
   title = "Weighted Sum Model (WSM)";
   wsmData: any = {};
   selectedTopCount: number = 3; 

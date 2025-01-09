@@ -33,7 +33,7 @@ export class PrometheeComponent {
   faTriangleExclamation = faTriangleExclamation;
   faFloppyDisk = faFloppyDisk; 
 
-  title = 'Promethee';
+  title = 'Preference Ranking Organization Method for Enrichment Evaluations (PROMETHEE)';
   prometheeData: any = {};
   selectedTopCount: number = 3; 
   showScores: boolean = false;
