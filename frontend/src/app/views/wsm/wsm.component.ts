@@ -182,9 +182,10 @@ export class WsmComponent {
     console.log('Payload:', payload);
 
     this.http
-        .post(apiEndpoints.apiUrlPrometheeCalculation, payload)
+        .post(apiEndpoints.apiUrlWsmCalculation, payload)
         .subscribe(
             (data: any) => {
+                console.log('Backend Response:', data);
                 this.wsmData = data;
                 this.calculateTopThreeCompanies();
 
